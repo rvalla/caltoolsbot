@@ -1,0 +1,12 @@
+{
+	"bot_name": "musiCal Bot",
+	"hello": "Hola, soy <b>musiCal Bot</b>. Pongo a tu disposición distintas herramientas para ayudarte a hacer música.",
+	"pcs_1": "Veamos a qué conjunto de grados cromáticos corresponde tu lista de notas...",
+	"pcs_2": "No logré encontrar ninguna forma prima en la lista de Forte después de ordenar tus notas. ¿Hay algún error?",
+	"pcs_3": "¡Cuidado! Necesito que me mandes una lista de números separados con espacios a continuación del comando.",
+	"language": "¿Qué idioma querés que use?",
+	"language2": "",
+	"language3": "¡Bien! Yo también prefiero el español.",
+	"error": "Algo salió mal. Me da un poco de vergüenza (mentira, soy un robot).",
+	"empty": "Me parece que no mandaste nada."
+}

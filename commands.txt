@@ -1,0 +1,4 @@
+start - Primero te saludo.
+pcs - Analizo conjuntos de grados cromáticos.
+language - Decidí qué idioma uso.
+help - Puedo intentar ayudarte...
