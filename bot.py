@@ -1,5 +1,5 @@
-from telegram.ext import Application, InlineQueryHandler, CommandHandler, CallbackQueryHandler, ContextTypes
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, MessageHandler
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 from telegram.constants import ParseMode
 import traceback, logging
 import json as js
@@ -117,21 +117,23 @@ def main() -> None:
 		logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 	else:
 		logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-	app = Application.builder().token(config["token"]).build()
-	#app.add_error_handler(error_notification)
-	app.add_handler(CommandHandler("start", start))
-	app.add_handler(CommandHandler("language", select_language))
-	app.add_handler(CommandHandler("pcs", get_pcs_info))
-	app.add_handler(CommandHandler("help", print_help))
-	app.add_handler(CommandHandler("botusage", bot_usage))
-	app.add_handler(CommandHandler("saveusage", save_usage))
-	app.add_handler(CallbackQueryHandler(button_click))
+	updater = Updater(config["token"], request_kwargs={'read_timeout': 5, 'connect_timeout': 5})
+	dp = updater.dispatcher
+	dp.add_error_handler(error_notification)
+	dp.add_handler(CommandHandler("start", start))
+	dp.add_handler(CommandHandler("language", select_language))
+	dp.add_handler(CommandHandler("pcs", get_pcs_info))
+	dp.add_handler(CommandHandler("help", print_help))
+	dp.add_handler(CommandHandler("botusage", bot_usage))
+	dp.add_handler(CommandHandler("saveusage", save_usage))
+	dp.add_handler(CallbackQueryHandler(button_click))
 	if config["webhook"]:
 		wh_url = "https://" + config["public_ip"] + ":" + str(config["webhook_port"]) + "/" + config["webhook_path"]
 		updater.start_webhook(listen="0.0.0.0", port=config["webhook_port"], url_path=config["webhook_path"], key="webhook.key",
 							cert="webhook.pem", webhook_url=wh_url, drop_pending_updates=True)
 	else:
-		app.run_polling(drop_pending_updates=True)
+		updater.start_polling(drop_pending_updates=True)
+		updater.idle()
 
 if __name__ == "__main__":
 	main()
