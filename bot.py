@@ -1,6 +1,5 @@
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, MessageHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
-from telegram.constants import ParseMode
 import traceback, logging
 import json as js
 from usage import Usage
@@ -57,7 +56,7 @@ def select_language(update, context):
 	reply = InlineKeyboardMarkup(keyboard)
 	context.bot.send_message(chat_id=id, text=msg.get_message("language", get_language(id)), reply_markup=reply, parse_mode=ParseMode.HTML)
 
-def set_language(update, context):
+def set_language(update, context, query):
 	id = update.effective_chat.id
 	if query == "l_1":
 		logging.info("English is the language selected by " + str(hide_id(id)))
