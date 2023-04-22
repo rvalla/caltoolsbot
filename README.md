@@ -1,6 +1,6 @@
-![logo](https://gitlab.com/musicaltools/calac/-/raw/master/assets/img/icon_64.png)
+![logo](https://gitlab.com/musicaltools/musicaltools.gitlab.io/-/raw/themoststable/public/assets/img/logo_64.png)
 
-# musicCal: telegram bot
+# musiCal: telegram bot
 
 This is the code for a telegram bot.
 
