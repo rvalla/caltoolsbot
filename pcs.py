@@ -2,10 +2,11 @@ class PCS():
 	"A tool to recognize pitch class sets"
 
 	def __init__(self):
+		#We load prime forms and data related to Z pairs and invariance...
 		self.prime_forms, self.set_data = self.load_prime_forms()
 	
 	def get_set_info(self, string_notes):
-		notes = self.string_to_notes(string_notes)
+		notes = self.string_to_notes(string_notes) #converting a string into an integer list...
 		cardinality = len(notes)
 		ordered_form = self.ordered_form(notes)
 		interval = ordered_form[0]
@@ -22,8 +23,9 @@ class PCS():
 	
 	def search_set(self, cardinality, is_inverted, prime_form):
 		found = False
-		ordinal = None
+		ordinal = None #if the set is not in the database we will return None
 		for s in range(len(self.prime_forms[cardinality-1])):
+			#searching for the set in the database...
 			found = self.compare_set(prime_form, self.prime_forms[cardinality-1][s])
 			if found:
 				ordinal = s + 1
@@ -31,11 +33,13 @@ class PCS():
 		if found:
 			return is_inverted, ordinal
 		elif not is_inverted:
+			#trying again, maybe the set is inverted...
 			return self.search_set(cardinality, True, self.prime_form(self.invert_set(cardinality, prime_form)))
 		else:
 			return is_inverted, ordinal
 
 	def compare_set(self, in_set, list_set):
+		#comparing sets element by element backwards...
 		is_equal = True
 		for s in range(len(in_set)-1,0,-1):
 			if in_set[s] != list_set[s]:
@@ -44,6 +48,7 @@ class PCS():
 		return is_equal
 			
 	def prime_form(self, notes):
+		#a prime form is simply an ordered form from 0...
 		ordered_form = self.ordered_form(notes)
 		return self.move_set(ordered_form, -ordered_form[0])
 
@@ -53,30 +58,34 @@ class PCS():
 		candidates = self.get_ordered_candidates(cardinality, notes)
 		ordered_form = []
 		if len(candidates) == 1:
+			#if we received only one candidate we found the ordered form...
 			ordered_form = candidates[0]
 		else:
+			#if there are two or more candidates we need extra work...
 			ordered_form = self.debug_candidates(cardinality, candidates)
 		return ordered_form
 	
 	def get_ordered_candidates(self, cardinality, notes):
+		#looking for candidates that fullfill requirement 1...
 		candidates = []
 		interval = 11
 		for i in range(cardinality):
-			d = (notes[i]-notes[(i+1)%cardinality])%12
+			d = (notes[(i-1)%cardinality]-notes[i])%12
 			if d < interval:
 				interval = d
-				candidates = [self.reorder_set(cardinality, notes, (i+1)%cardinality)]
+				candidates = [self.reorder_set(cardinality, notes, i)]
 			elif d == interval:
-				candidates.append(self.reorder_set(cardinality, notes, (i+1)%cardinality))
+				candidates.append(self.reorder_set(cardinality, notes, i))
 		return candidates
 
 	def debug_candidates(self, cardinality, candidates):
-		ordered_form = candidates[0]
-		candidate_states = [i for i in range(len(candidates))]
-		interval = 11
+		ordered_form = candidates[0] #if requirement 2 is not decisive any candidate is valid...
+		actual_candidates = [i for i in range(len(candidates))] #the candidates for each step...
+		interval = 11 #the bigger possible interval...
 		for i in range(1,cardinality-1):
-			new_candidates = []
-			for c in candidate_states:
+			new_candidates = [] #we want to discard candidates...
+			for c in actual_candidates:
+				#checking requirement 2...
 				d = (candidates[c][i]-candidates[c][0])%12
 				if d < interval:
 					interval = d
@@ -84,12 +93,17 @@ class PCS():
 				elif d == interval: 
 					new_candidates.append(c)
 			if len(new_candidates) == 1:
+				#if we received only one new_candidate we found the ordered form...
 				ordered_form = candidates[new_candidates[0]]
 				break
+			else:
+				#if there are two or more new_candidates we need extra work...
+				actual_candidates = new_candidates #we will check only these candidates...
+				interval = 11 #the interval needs to be reset...
 		return ordered_form
 
 	def reorder_set(self, cardinality, notes, start):
-		new_notes = []
+		new_notes = [] #saving a new circular permutation of the set...
 		for i in range(cardinality):
 			new_notes.append(notes[(i+start)%cardinality])
 		return new_notes
@@ -173,7 +187,6 @@ class PCS():
 		m += self.notes_to_string(ordered_form) + " " + self.notes_to_string(prime_form) + "\n"
 		m += self.vector_to_string(self.interval_vector(ordered_form)) + " |" + str(states) + "|\n"
 		return m
-		
-
+	
 	def __str__(self):
 		return "-- Hi, I am a Pitch Class Sets analysis tool." + "\n"
