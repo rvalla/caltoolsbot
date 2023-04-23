@@ -74,6 +74,7 @@ async def report_error(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
 	m = context.chat_data["error_command"]
 	m2 = update.message.text
 	context.chat_data["error_description"] = m2
+	us.add_error_report()
 	us.save_error_report(m, m2, str(hide_id(id)))
 	admin_msg = "Error reported:\n-command: " + m + "\n-description: " + m2
 	await context.bot.send_message(chat_id=config["admin_id"], text=admin_msg, parse_mode=ParseMode.HTML)
@@ -151,10 +152,17 @@ async def save_usage(update, context):
 	m = update.message.text.split(" ")
 	if len(m) > 1 and m[1] == config["password"]:
 		us.save_usage()
-		await context.bot.send_message(chat_id=id, text="Datos guardados...", parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=id, text="¡Datos guardados!", parse_mode=ParseMode.HTML)
 	else:
 		logging.info(hide_id(id) + " wanted to save bot usage data...")
 		await context.bot.send_message(chat_id=id, text=msg.get_message("intruder", get_language(id)), parse_mode=ParseMode.HTML)
+
+#Notifying the user about out of context conversation...
+async def out_of_context(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+	id = update.effective_chat.id
+	us.add_outofcontext()
+	logging.info(str(hide_id(id)) + " sent out of context message...")
+	await context.bot.send_message(chat_id=id, text=msg.get_outofcontext(get_language(id)), parse_mode=ParseMode.HTML)
 
 #Sending error notification to administrator...
 async def error_notification(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -191,7 +199,7 @@ def main() -> None:
 	else:
 		logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 	app = Application.builder().token(config["token"]).build()
-	#app.add_error_handler(error_notification)
+	app.add_error_handler(error_notification)
 	app.add_handler(CommandHandler("start", start), group=2)
 	app.add_handler(CommandHandler("language", select_language), group=2)
 	app.add_handler(CommandHandler("help", print_help), group=2)
@@ -199,6 +207,7 @@ def main() -> None:
 	app.add_handler(CommandHandler("saveusage", save_usage), group=2)
 	app.add_handler(CallbackQueryHandler(button_click), group=2)
 	app.add_handler(build_conversation_handler(), group=1)
+	app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, out_of_context), group=1)
 	if config["webhook"]:
 		wh_url = "https://" + config["public_ip"] + ":" + str(config["webhook_port"]) + "/" + config["webhook_path"]
 		updater.start_webhook(listen="0.0.0.0", port=config["webhook_port"], url_path=config["webhook_path"], key="webhook.key",

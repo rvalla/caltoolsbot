@@ -12,5 +12,6 @@
 	"submit_error_3": "Muchas gracias por tomarte un minuto para mejorarme. Esperemos que @rvalla me arregle pronto.",
 	"end_conversation": "Doy por terminada nuestra conversación.",
 	"error": "Algo salió mal. Me da un poco de vergüenza (mentira, soy un robot).",
+	"intruder": "No tenés autorización para usar este comando. Incluso no deberías conocerlo.",
 	"empty": "Me parece que no mandaste nada."
 }

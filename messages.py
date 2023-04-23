@@ -5,14 +5,16 @@ class Messages():
 	"The class the bot use to know what to say..."
 
 	def __init__(self):
-		self.msg_es = js.load(open("messages_es.json"))
-		self.msg_en = js.load(open("messages_en.json"))
+		self.msg_es = js.load(open("assets/text/es/messages.json"))
+		self.msg_en = js.load(open("assets/text/en/messages.json"))
 		self.r_conversation_start_es = open("assets/text/es/random_conversation_start.txt").readlines()
 		self.r_conversation_start_en = open("assets/text/en/random_conversation_start.txt").readlines()
 		self.r_conversation_end_es = open("assets/text/es/random_conversation_end.txt").readlines()
 		self.r_conversation_end_en = open("assets/text/en/random_conversation_end.txt").readlines()
 		self.r_error_message_es = open("assets/text/es/random_apologies.txt").readlines()
 		self.r_error_message_en = open("assets/text/en/random_apologies.txt").readlines()
+		self.r_outofcontext_es = open("assets/text/es/random_outofcontext.txt").readlines()
+		self.r_outofcontext_en = open("assets/text/en/random_outofcontext.txt").readlines()
 
 	def get_message(self, key, l):
 		if l == 1:
@@ -37,6 +39,12 @@ class Messages():
 			return rd.choice(self.r_error_message_es)
 		else:
 			return rd.choice(self.r_error_message_en)
+	
+	def get_outofcontext(self, l):
+		if l == 0:
+			return rd.choice(self.r_outofcontext_es)
+		else:
+			return rd.choice(self.r_outofcontext_en)
 	
 	def build_pcs_message(self, c, o, i, inverted, z_pair, states, ordered, prime, vector, l):
 		m = ""

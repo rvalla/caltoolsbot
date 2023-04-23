@@ -13,8 +13,10 @@ class Usage():
 		self.last_save = dt.datetime.now() #the start up time...
 		self.start = 0
 		self.pcs = [0,0,0] #success, wrong set, wrong input...
+		self.error_reports = 0
 		self.language = [0,0] #spanish, english...
 		self.help = 0
+		self.outofcontext = 0
 		self.errors = 0
 
 	#Building usage information message...
@@ -22,8 +24,10 @@ class Usage():
 		m = "<b>Usage data:</b>" + "\n" + \
 			"start: " + str(self.start) + "\n" + \
 			"pcs: " + str(self.pcs) + "\n" + \
+			"error reports: " + str(self.error_reports) + "\n" + \
 			"language: " + str(self.language) + "\n" + \
 			"help: " + str(self.help) + "\n" + \
+			"out of context: " + str(self.outofcontext) + "\n" + \
 			"errors: " + str(self.errors) + "\n"
 		return m
 
@@ -45,8 +49,10 @@ class Usage():
 		line += interval + ";"
 		line += str(self.start) + ";"
 		line += str(self.pcs) + ";"
+		line += str(self.error_reports) + ";"
 		line += str(self.language) + ";"
 		line += str(self.help) + ";"
+		line += str(self.outofcontext) + ";"
 		line += str(self.errors) + "\n"
 		return line
 
@@ -57,6 +63,10 @@ class Usage():
 	#Registering a new color...
 	def add_pcs(self, key):
 		self.pcs[key] += 1
+	
+	#Registering a new error report...
+	def add_error_report(self):
+		self.error_reports += 1
 
 	#Registering a new language...
 	def add_language(self, l):
@@ -65,6 +75,10 @@ class Usage():
 	#Registering a new help...
 	def add_help(self):
 		self.help += 1
+	
+	#Registering an out of context message...
+	def add_outofcontext(self):
+		self.outofcontext += 1
 
 	#Registering a new error...
 	def add_error(self):

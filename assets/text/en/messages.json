@@ -12,5 +12,6 @@
 	"submit_error_3": "Thank you so much for taking a minute to make me better. Hopefully @rvalla will fix me soon.",
 	"end_conversation": "I terminated our conversation sesion.",
 	"error": "Something went wrong... I am so sorry!",
+	"intruder": "This is a secret command. You are not authorized to use it.",
 	"empty": "I feel empty..."
 }
