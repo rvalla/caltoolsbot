@@ -1,4 +1,5 @@
 import json as js
+import random as rd
 
 class Messages():
 	"The class the bot use to know what to say..."
@@ -6,12 +7,36 @@ class Messages():
 	def __init__(self):
 		self.msg_es = js.load(open("messages_es.json"))
 		self.msg_en = js.load(open("messages_en.json"))
+		self.r_conversation_start_es = open("assets/text/es/random_conversation_start.txt").readlines()
+		self.r_conversation_start_en = open("assets/text/en/random_conversation_start.txt").readlines()
+		self.r_conversation_end_es = open("assets/text/es/random_conversation_end.txt").readlines()
+		self.r_conversation_end_en = open("assets/text/en/random_conversation_end.txt").readlines()
+		self.r_error_message_es = open("assets/text/es/random_apologies.txt").readlines()
+		self.r_error_message_en = open("assets/text/en/random_apologies.txt").readlines()
 
 	def get_message(self, key, l):
 		if l == 1:
 			return self.msg_en[key]
 		else:
 			return self.msg_es[key]
+	
+	def get_conversation_start(self, l):
+		if l == 0:
+			return rd.choice(self.r_conversation_start_es)
+		else:
+			return rd.choice(self.r_conversation_start_en)
+	
+	def get_conversation_end(self, l):
+		if l == 0:
+			return rd.choice(self.r_conversation_end_es)
+		else:
+			return rd.choice(self.r_conversation_end_en)
+	
+	def get_apology(self, l):
+		if l == 0:
+			return rd.choice(self.r_error_message_es)
+		else:
+			return rd.choice(self.r_error_message_en)
 	
 	def build_pcs_message(self, c, o, i, inverted, z_pair, states, ordered, prime, vector, l):
 		m = ""
@@ -68,8 +93,19 @@ class Messages():
 		m = ""
 		if l == 0:
 			m += "Podés pedirme distintas cosas. Acá te dejo los comandos disponibles:\n\n"
-			m += "> Mandame /pcs seguido de una lista de notas separadas con espacios (ojo que entiendo números 0-11).\n" 
+			m += "> Mandame /pcs para analizar conmigo conjuntos de grados cromáticos (ojo que entiendo números (0-11)).\n"
+			m += "> Mandame /error para reportar cualquier error que me encuentres."
 		else:
 			m += "You can ask me for different things. Here is a list with the available commands:\n\n"
-			m += "> Send me /pcs followed by a list of notes separated with spaces (note that I understand numbers 0-11).\n" 
-		return m
+			m += "> Send me /pcs to start a pitch class set analysis sesion (note that I understand numbers (0-11)).\n" 
+			m += "> Send me /error to report any error you find on me."
+		m2 = ""
+		if l == 0:
+			m2 += "Podés suscribirte al canal @caltools para enterarte de cómo evoluciono. "
+			m2 += "Si tenés dudas, quejas o preguntas podés escribirle a @rvalla (es el culpable de todo). "
+			m2 += "También podés visitar la página del proyecto <a href='https://musicaltools.gitlab.io'>musiCal</a>."
+		else:
+			m2 += "Suscribe to @caltools channel to find out how I evolve (in spanish). "
+			m2 += "If you have any doubts, complaints or questions you can write to @rvalla (he's the one to blame for everything). "
+			m2 += "You can also visit the <a href='https://musicaltools.gitlab.io/index_en.html'>musiCal</a> project website."
+		return m, m2

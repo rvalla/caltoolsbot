@@ -1,12 +1,16 @@
 {
 	"bot_name": "musiCal Bot",
-	"hello": "Hi, I am <b>musiCal Bot</b>. I offer you some tools that can be useful for your music creation process!",
-	"pcs_1": "Let's see which pitch class set your list of notes belongs to...",
+	"hello": "Hi, I am <b>musiCal Bot</b>. I offer you some tools that can be useful for your music creation process! Send me /help to get started.",
+	"pcs_1": "From now on you can send me your pitch sets separating each note (0-11) with spaces. Send me and invented command to terminate (/shutup).",
 	"pcs_2": "I couldn't find any prime form after ordering your notes. Is there a mistake?",
-	"pcs_3": "Be careful! I need you to send me a list of numbers separated with spaces after the command..",
+	"pcs_3": "Be careful! I need you to send me a list of numbers separated with spaces.",
 	"language": "Please, select your prefered language.",
 	"language2": "Note that this bot does not store any persistent data from you. If the bot is restarted it will be forget your preference. In that case, be patient and send <b>/language</b> again.",
 	"language3": "I will try speak en english now...",
+	"submit_error_1": "Please tell me which command the error you are reporting is related to.",
+	"submit_error_2": "Tell me briefly what the error you found is about.",
+	"submit_error_3": "Thank you so much for taking a minute to make me better. Hopefully @rvalla will fix me soon.",
+	"end_conversation": "I terminated our conversation sesion.",
 	"error": "Something went wrong... I am so sorry!",
 	"empty": "I feel empty..."
 }

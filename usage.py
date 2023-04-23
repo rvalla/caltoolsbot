@@ -3,8 +3,9 @@ import datetime as dt
 class Usage():
 	"The class to save usage data..."
 
-	def __init__(self, path):
-		self.output_path = path
+	def __init__(self, usage_path, errors_path):
+		self.output_path = usage_path
+		self.errors_path = errors_path
 		self.reset()
 
 	#Resseting data variables...
@@ -68,3 +69,14 @@ class Usage():
 	#Registering a new error...
 	def add_error(self):
 		self.errors += 1
+	
+	#Saving en error report...
+	def save_error_report(self, command, description, user):
+		file = open(self.errors_path, "a")
+		t = dt.datetime.now()
+		date = str(t.year) + "-" + str(t.month) + "-" + str(t.day)
+		file.write(date)
+		file.write(command)
+		file.write(description)
+		file.write(user + "\n")
+		file.close()

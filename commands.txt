@@ -1,4 +1,5 @@
 start - Primero te saludo.
 pcs - Analizo conjuntos de grados cromáticos.
+error - El comando para reportar un error.
 language - Decidí qué idioma uso.
 help - Puedo intentar ayudarte...
