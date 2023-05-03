@@ -4,6 +4,8 @@
 	"pcs_1": "A partir de ahora podés enviarme tus conjuntos de alturas separando las distintas notas (0-11) con espacios. Mandame un comando inventado para terminar (/cortala).",
 	"pcs_2": "No logré encontrar ninguna forma prima en la lista de Forte después de ordenar tus notas. ¿Hay algún error?",
 	"pcs_3": "¡Cuidado! Necesito que me mandes una lista de números separados con espacios.",
+	"chain_1": "A partir de ahora podés enviarme tus conjuntos de alturas separando las distintas notas (0-11) con espacios. Voy a intentar crear una secuencia de notas manteniendo el conjunto de grados cromáticos constante. Mandame un comando inventado para terminar (/cortala).",
+	"chain_2": "No pude crear una cadena de notas con lo que mandaste. ¿Hay algún error?",
 	"language": "¿Qué idioma querés que use?",
 	"language2": "",
 	"language3": "¡Bien! Yo también prefiero el español.",

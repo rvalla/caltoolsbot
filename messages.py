@@ -67,6 +67,36 @@ class Messages():
 			m += "- Prime form: <b>" + self.notes_to_string(prime) + "</b>\n"
 			m += "- Interval vector: <b>" + self.vector_to_string(vector) + "</b>"
 		return m
+	
+	def build_chain_message(self, chain, l):
+		m = ""
+		if l == 0:
+			state = ""
+			if chain.is_closed:
+				state = "cerrada"
+			elif chain.is_closable:
+				state = "que puede cerrarse"
+			else:
+				state = "abierta"
+			m = "Las notas que enviaste corresponden al conjunto "
+			m += "<b>" + self.get_set_class(chain.base_data["cardinality"], chain.base_data["ordinal"],
+							chain.base_data["z_pair"]) + "</b>. "
+			m += "Logré construir una cadena " + state + " con esas notas. Te dejo acá la cadena:\n\n"
+			m += "<b>" + chain.sequence_to_string(chain.sequence) + "</b>"
+		else:
+			state = ""
+			if chain.is_closed:
+				state = "a closed"
+			elif chain.is_closable:
+				state = "a closable"
+			else:
+				state = "an open"
+			m = "The notes you send me correspond to the "
+			m += "<b>" + self.get_set_class(chain.base_data["cardinality"], chain.base_data["ordinal"],
+							chain.base_data["z_pair"]) + "</b> pitch class set. "
+			m += "I could create " + state + " notes sequence with them. Here are the notes:\n\n"
+			m += "<b>" + chain.sequence_to_string(chain.sequence) + "</b>"
+		return m
 
 	def get_complete_set_class(self, cardinal, ordinal, interval, inverted, z_pair):
 		m = str(cardinal) + "."
@@ -102,10 +132,12 @@ class Messages():
 		if l == 0:
 			m += "Podés pedirme distintas cosas. Acá te dejo los comandos disponibles:\n\n"
 			m += "> Mandame /pcs para analizar conmigo conjuntos de grados cromáticos (ojo que entiendo números (0-11)).\n"
+			m += "> Mandame /chain para crear secuencias de notas con un conjunto de grados cromáticos constante.\n"
 			m += "> Mandame /error para reportar cualquier error que me encuentres."
 		else:
 			m += "You can ask me for different things. Here is a list with the available commands:\n\n"
 			m += "> Send me /pcs to start a pitch class set analysis sesion (note that I understand numbers (0-11)).\n" 
+			m += "> Send me /chain to start a constant pitch class set sequence creation session.\n"
 			m += "> Send me /error to report any error you find on me."
 		m2 = ""
 		if l == 0:

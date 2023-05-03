@@ -10,13 +10,15 @@ import json as js
 from usage import Usage
 from messages import Messages
 from pcs import PCS
+from chain import Chain
 
+print("Starting musiCal Bot...", end="\n")
 config = js.load(open("config.json")) #The configuration file (token included)
 en_users = set() #In this set the bot store ids from users who prefer to speak in English
 us = Usage("usage.csv", "errors.csv") #The class to work with usage data...
 msg = Messages() #The class to build content of text messages...
 pcs = PCS() #A class to analyze pitch class sets...
-PCS_SESSION, ERROR1, ERROR2 = range(3) #The conversation states...
+PCS_S, CHAIN_S, ERROR1, ERROR2 = range(4) #The conversation states...
 
 #Welcome message for people who start the bot...
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -31,7 +33,7 @@ async def trigger_pcs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
 	logging.info(str(hide_id(id)) + " starts pcs conversation...")
 	await context.bot.send_message(chat_id=id, text=msg.get_conversation_start(get_language(id)), parse_mode=ParseMode.HTML)
 	await context.bot.send_message(chat_id=id, text=msg.get_message("pcs_1", get_language(id)), parse_mode=ParseMode.HTML)
-	return PCS_SESSION
+	return PCS_S
 
 #Analyzing pitch class sets sent by the user...
 async def get_pcs_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -50,7 +52,29 @@ async def get_pcs_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
 	except:
 		us.add_pcs(2)
 		await context.bot.send_message(chat_id=id, text=msg.get_message("pcs_3", get_language(id)), parse_mode=ParseMode.HTML)
-	return PCS_SESSION
+	return PCS_S
+
+#Starting a constant pitch class set sequence creation session...
+async def trigger_chain(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+	id = update.effective_chat.id
+	logging.info(str(hide_id(id)) + " starts chain conversation...")
+	await context.bot.send_message(chat_id=id, text=msg.get_conversation_start(get_language(id)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=id, text=msg.get_message("chain_1", get_language(id)), parse_mode=ParseMode.HTML)
+	return CHAIN_S
+
+#Creating a new constant pitch class set notes sequence...
+async def get_new_chain(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+	id = update.effective_chat.id
+	text = update.message.text
+	try:
+		the_chain = Chain(pcs, text, 7, 14, 3)
+		m = msg.build_chain_message(the_chain, get_language(id))
+		us.add_chain(0)
+		await context.bot.send_message(chat_id=id, text=m, parse_mode=ParseMode.HTML)
+	except:
+		us.add_chain(1)
+		await context.bot.send_message(chat_id=id, text=msg.get_message("chain_2", get_language(id)), parse_mode=ParseMode.HTML)
+	return CHAIN_S
 
 #Starting an error report session...
 async def trigger_error_submit(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -178,10 +202,13 @@ def hide_id(id):
 
 #Building the conversation handler...
 def build_conversation_handler():
+	print("Building conversation handler...", end="\n")
 	handler = ConversationHandler(
-		entry_points=[CommandHandler("pcs", trigger_pcs),CommandHandler("error", trigger_error_submit)],
+		entry_points=[CommandHandler("pcs", trigger_pcs),CommandHandler("chain", trigger_chain),
+					CommandHandler("error", trigger_error_submit)],
 		states={
-			PCS_SESSION: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_pcs_info)],
+			PCS_S: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_pcs_info)],
+			CHAIN_S: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_new_chain)],
 			ERROR1: [MessageHandler(filters.TEXT, report_command)],
 			ERROR2: [MessageHandler(filters.TEXT & ~filters.COMMAND, report_error)],
 		},
@@ -198,6 +225,7 @@ def main() -> None:
 		logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 	else:
 		logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+	print("Ready to build the bot...", end="\n")
 	app = Application.builder().token(config["token"]).build()
 	app.add_error_handler(error_notification)
 	app.add_handler(CommandHandler("start", start), group=2)
@@ -214,6 +242,7 @@ def main() -> None:
 							cert="webhook.pem", webhook_url=wh_url, drop_pending_updates=True)
 	else:
 		app.run_polling(drop_pending_updates=True)
+	print("The bot is running now...", end="\n")
 
 if __name__ == "__main__":
 	main()

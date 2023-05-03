@@ -13,6 +13,7 @@ class Usage():
 		self.last_save = dt.datetime.now() #the start up time...
 		self.start = 0
 		self.pcs = [0,0,0] #success, wrong set, wrong input...
+		self.chain = [0,0] #success, error...
 		self.error_reports = 0
 		self.language = [0,0] #spanish, english...
 		self.help = 0
@@ -24,6 +25,7 @@ class Usage():
 		m = "<b>Usage data:</b>" + "\n" + \
 			"start: " + str(self.start) + "\n" + \
 			"pcs: " + str(self.pcs) + "\n" + \
+			"chain: " + str(self.chain) + "\n" + \
 			"error reports: " + str(self.error_reports) + "\n" + \
 			"language: " + str(self.language) + "\n" + \
 			"help: " + str(self.help) + "\n" + \
@@ -49,6 +51,7 @@ class Usage():
 		line += interval + ";"
 		line += str(self.start) + ";"
 		line += str(self.pcs) + ";"
+		line += str(self.chain) + ";"
 		line += str(self.error_reports) + ";"
 		line += str(self.language) + ";"
 		line += str(self.help) + ";"
@@ -60,9 +63,13 @@ class Usage():
 	def add_start(self):
 		self.start += 1
 
-	#Registering a new color...
+	#Registering a new pcs...
 	def add_pcs(self, key):
 		self.pcs[key] += 1
+	
+	#Registering a new chain...
+	def add_chain(self, key):
+		self.chain[key] += 1
 	
 	#Registering a new error report...
 	def add_error_report(self):

@@ -1,5 +1,6 @@
 start - Primero te saludo.
 pcs - Analizo conjuntos de grados cromáticos.
+chain - Creo secuencias de notas con un conjunto de grados crómáticos constante.
 error - El comando para reportar un error.
 language - Decidí qué idioma uso.
 help - Puedo intentar ayudarte...
