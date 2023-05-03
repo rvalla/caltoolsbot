@@ -190,7 +190,6 @@ async def out_of_context(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 #Sending error notification to administrator...
 async def error_notification(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-	id = update.effective_chat.id
 	m = "An error ocurred! While comunicating with chat " + str(hide_id(id))
 	logging.info(m)
 	await context.bot.send_message(chat_id=config["admin_id"], text=m, parse_mode=ParseMode.HTML)
