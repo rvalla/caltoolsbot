@@ -70,3 +70,38 @@ Logging history...
 2023-05-07 14:41:08,035 - telegram.ext._application - ERROR - An error was raised and an uncaught error was raised while handling the error with an error_handler.
 2023-05-07 14:49:43,843 - telegram.ext._application - INFO - Application is stopping. This might take a moment.
 2023-05-07 14:49:43,850 - telegram.ext._application - INFO - Application.stop() complete
+2023-05-14 17:55:51,999 - telegram.ext.Application - INFO - Application started
+2023-05-14 17:56:35,550 - telegram.ext.Updater - ERROR - Error while getting Updates: httpx.ConnectError: [Errno -3] Temporary failure in name resolution
+2023-05-14 17:56:35,554 - root - INFO - An error ocurred! While comunicating with chat **** id>
+2023-05-14 17:56:35,596 - telegram.ext.Application - ERROR - An error was raised and an uncaught error was raised while handling the error with an error_handler.
+2023-05-14 17:56:36,590 - telegram.ext.Updater - ERROR - Error while getting Updates: httpx.ConnectError: [Errno -3] Temporary failure in name resolution
+2023-05-14 17:56:36,594 - root - INFO - An error ocurred! While comunicating with chat **** id>
+2023-05-14 17:56:36,631 - telegram.ext.Application - ERROR - An error was raised and an uncaught error was raised while handling the error with an error_handler.
+2023-05-14 17:56:38,130 - telegram.ext.Updater - ERROR - Error while getting Updates: httpx.ConnectError: [Errno -3] Temporary failure in name resolution
+2023-05-14 17:56:38,134 - root - INFO - An error ocurred! While comunicating with chat **** id>
+2023-05-14 17:56:38,172 - telegram.ext.Application - ERROR - An error was raised and an uncaught error was raised while handling the error with an error_handler.
+2023-05-14 17:56:40,422 - telegram.ext.Updater - ERROR - Error while getting Updates: httpx.ConnectError: [Errno -3] Temporary failure in name resolution
+2023-05-14 17:56:40,425 - root - INFO - An error ocurred! While comunicating with chat **** id>
+2023-05-14 17:56:40,463 - telegram.ext.Application - ERROR - An error was raised and an uncaught error was raised while handling the error with an error_handler.
+2023-05-14 17:56:43,840 - telegram.ext.Updater - ERROR - Error while getting Updates: httpx.ConnectError: [Errno -3] Temporary failure in name resolution
+2023-05-14 17:56:43,844 - root - INFO - An error ocurred! While comunicating with chat **** id>
+2023-05-14 17:56:43,881 - telegram.ext.Application - ERROR - An error was raised and an uncaught error was raised while handling the error with an error_handler.
+2023-05-14 17:56:48,945 - telegram.ext.Updater - ERROR - Error while getting Updates: httpx.ConnectError: [Errno -3] Temporary failure in name resolution
+2023-05-14 17:56:48,949 - root - INFO - An error ocurred! While comunicating with chat **** id>
+2023-05-14 17:56:48,987 - telegram.ext.Application - ERROR - An error was raised and an uncaught error was raised while handling the error with an error_handler.
+2023-05-14 17:57:08,141 - root - INFO - ****8891 starts chain conversation...
+2023-05-14 17:57:21,911 - root - INFO - ****8891 endss a conversation...
+2023-05-15 13:13:09,735 - root - INFO - ****8891 sent out of context message...
+2023-05-15 13:13:17,182 - root - INFO - ****8891 starts pcs conversation...
+2023-05-15 13:13:31,473 - root - INFO - ****8891 endss a conversation...
+2023-05-15 17:54:09,636 - root - INFO - ****8891 starts chain conversation...
+2023-05-15 17:54:34,083 - root - INFO - ****8891 endss a conversation...
+2023-05-16 07:24:31,763 - root - INFO - ****8891 sent out of context message...
+2023-05-16 07:24:45,294 - root - INFO - ****8891 sent out of context message...
+2023-05-16 07:24:55,412 - root - INFO - ****8891 sent out of context message...
+2023-05-17 20:40:08,345 - telegram.ext.Updater - ERROR - Error while getting Updates: httpx.ConnectError: [Errno -3] Temporary failure in name resolution
+2023-05-17 20:40:08,349 - root - INFO - An error ocurred! While comunicating with chat **** id>
+2023-05-17 20:40:08,397 - telegram.ext.Application - ERROR - An error was raised and an uncaught error was raised while handling the error with an error_handler.
+2023-05-17 20:40:09,384 - telegram.ext.Updater - ERROR - Error while getting Updates: httpx.ConnectError: [Errno -3] Temporary failure in name resolution
+2023-05-17 20:40:09,388 - root - INFO - An error ocurred! While comunicating with chat **** id>
+2023-05-17 20:40:09,424 - telegram.ext.Application - ERROR - An error was raised and an uncaught error was raised while handling the error with an error_handler.
