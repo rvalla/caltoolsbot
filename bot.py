@@ -18,7 +18,7 @@ en_users = set() #In this set the bot store ids from users who prefer to speak i
 us = Usage("usage.csv", "errors.csv") #The class to work with usage data...
 msg = Messages() #The class to build content of text messages...
 pcs = PCS() #A class to analyze pitch class sets...
-PCS_S, CHAIN_S, ERROR1, ERROR2 = range(4) #The conversation states...
+PCS_S, CHAIN_S, MATRIX_1, MATRIX_2, ERROR_1, ERROR_2 = range(6) #The general conversation states...
 
 #Welcome message for people who start the bot...
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -82,7 +82,7 @@ async def trigger_error_submit(update: Update, context: ContextTypes.DEFAULT_TYP
 	logging.info(str(hide_id(id)) + " wants to report an error...")
 	await context.bot.send_message(chat_id=id, text=msg.get_apology(get_language(id)), parse_mode=ParseMode.HTML)
 	await context.bot.send_message(chat_id=id, text=msg.get_message("submit_error_1", get_language(id)), parse_mode=ParseMode.HTML)
-	return ERROR1
+	return ERROR_1
 
 #Saving error related command...
 async def report_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -90,7 +90,7 @@ async def report_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 	m = update.message.text
 	context.chat_data["error_command"] = m
 	await context.bot.send_message(chat_id=id, text=msg.get_message("submit_error_2", get_language(id)), parse_mode=ParseMode.HTML)
-	return ERROR2
+	return ERROR_2
 
 #Saving error description...
 async def report_error(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -158,6 +158,8 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 	query.answer()
 	if query.data.startswith("l"):
 		await set_language(update, context, query.data)
+	else:
+		await logging.info("Strange query from button recieved!")
 
 #Sending usage data...
 async def bot_usage(update, context):
@@ -190,6 +192,7 @@ async def out_of_context(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 #Sending error notification to administrator...
 async def error_notification(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+	id = update.effective_chat.id
 	m = "An error ocurred! While comunicating with chat " + str(hide_id(id))
 	logging.info(m)
 	await context.bot.send_message(chat_id=config["admin_id"], text=m, parse_mode=ParseMode.HTML)
@@ -199,8 +202,8 @@ def hide_id(id):
 	s = str(id)
 	return "****" + s[len(s)-4:]
 
-#Building the conversation handler...
-def build_conversation_handler():
+#Building the general conversation handler...
+def build_general_conversation_handler():
 	print("Building conversation handler...", end="\n")
 	handler = ConversationHandler(
 		entry_points=[CommandHandler("pcs", trigger_pcs),CommandHandler("chain", trigger_chain),
@@ -208,8 +211,8 @@ def build_conversation_handler():
 		states={
 			PCS_S: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_pcs_info)],
 			CHAIN_S: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_new_chain)],
-			ERROR1: [MessageHandler(filters.TEXT, report_command)],
-			ERROR2: [MessageHandler(filters.TEXT & ~filters.COMMAND, report_error)],
+			ERROR_1: [MessageHandler(filters.TEXT, report_command)],
+			ERROR_2: [MessageHandler(filters.TEXT & ~filters.COMMAND, report_error)],
 		},
 		fallbacks=[MessageHandler(filters.COMMAND, end_conversation)]
 		)
@@ -233,15 +236,16 @@ def main() -> None:
 	app.add_handler(CommandHandler("botusage", bot_usage), group=2)
 	app.add_handler(CommandHandler("saveusage", save_usage), group=2)
 	app.add_handler(CallbackQueryHandler(button_click), group=2)
-	app.add_handler(build_conversation_handler(), group=1)
+	app.add_handler(build_general_conversation_handler(), group=1)
 	app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, out_of_context), group=1)
 	if config["webhook"]:
+		print("Ready to set webhook...", end="\n")
 		wh_url = "https://" + config["public_ip"] + ":" + str(config["webhook_port"]) + "/" + config["webhook_path"]
-		updater.start_webhook(listen="0.0.0.0", port=config["webhook_port"], url_path=config["webhook_path"], key="webhook.key",
+		app.run_webhook(listen="0.0.0.0", port=config["webhook_port"], secret_token=config["webhook_path"], key="webhook.key",
 							cert="webhook.pem", webhook_url=wh_url, drop_pending_updates=True)
 	else:
+		print("Ready to start polling...", end="\n")
 		app.run_polling(drop_pending_updates=True)
-	print("The bot is running now...", end="\n")
 
 if __name__ == "__main__":
 	main()
