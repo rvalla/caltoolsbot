@@ -240,7 +240,7 @@ def main() -> None:
 	app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, out_of_context), group=1)
 	if config["webhook"]:
 		print("Ready to set webhook...", end="\n")
-		wh_url = "https://" + config["public_ip"] + ":" + str(config["webhook_port"]) + "/" + config["webhook_path"]
+		wh_url = "https://" + config["public_ip"] + ":" + str(config["webhook_port"])
 		app.run_webhook(listen="0.0.0.0", port=config["webhook_port"], secret_token=config["webhook_path"], key="webhook.key",
 							cert="webhook.pem", webhook_url=wh_url, drop_pending_updates=True)
 	else:
