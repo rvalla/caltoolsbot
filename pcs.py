@@ -11,10 +11,10 @@ class PCS():
 		cardinality = len(notes)
 		ordered_form = self.ordered_form(notes)
 		interval = ordered_form[0]
-		prime_form = self.move_set(ordered_form, -ordered_form[0])
+		prime_form = self.translate_set(ordered_form, -ordered_form[0])
 		is_inverted, ordinal = self.search_set(cardinality, False, prime_form)
 		if is_inverted:
-			prime_form = self.prime_form(self.invert_set(cardinality, ordered_form))
+			prime_form = self.prime_form(self.invert_set(ordered_form))
 		z_pair = None
 		states = None
 		if not ordinal == None:
@@ -43,7 +43,7 @@ class PCS():
 			return is_inverted, ordinal
 		elif not is_inverted:
 			#trying again, maybe the set is inverted...
-			return self.search_set(cardinality, True, self.prime_form(self.invert_set(cardinality, prime_form)))
+			return self.search_set(cardinality, True, self.prime_form(self.invert_set(prime_form)))
 		else:
 			return is_inverted, ordinal
 
@@ -61,7 +61,7 @@ class PCS():
 	def prime_form(self, notes):
 		#a prime form is simply an ordered form from 0...
 		ordered_form = self.ordered_form(notes)
-		return self.move_set(ordered_form, -ordered_form[0])
+		return self.translate_set(ordered_form, -ordered_form[0])
 
 	#getting the order form of a notes set...
 	def ordered_form(self, notes):
@@ -123,10 +123,10 @@ class PCS():
 		return new_notes
 	
 	#inverting a set...
-	def invert_set(self, cardinality, notes):
+	def invert_set(self, notes):
 		new_notes = []
-		for i in range(cardinality):
-			new_notes.append(12-notes[i]%12)
+		for i in range(len(notes)):
+			new_notes.append(-notes[i]%12)
 		return new_notes
 
 	#getting the interval vector...
@@ -140,7 +140,7 @@ class PCS():
 				if a != b:
 					interval = abs(a-b)
 					if interval > 6:
-						interval = 12 - interval
+						interval = -interval%12
 					vector[interval%6-1] += 1
 			step += 1
 		return vector
@@ -159,7 +159,7 @@ class PCS():
 		return vector
 	
 	#getting the trasposition of a set...
-	def move_set(self, notes, interval):
+	def translate_set(self, notes, interval):
 		new_notes = []
 		for n in notes:
 			new_notes.append((n+interval)%12)

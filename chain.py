@@ -149,12 +149,24 @@ class Chain():
 				break
 		return good_sequence
 	
+	#function to move the chain in pitch space...
+	def translate(self, t):
+		for l in range(self.sequence_size):
+			for n in range(len(self.sequence[l])):
+				self.sequence[l][n] = (self.sequence[l][n] + t)%12
+
+	#function to invert the chain in pitch space...
+	def invert(self):
+		for l in range(self.sequence_size):
+			for n in range(len(self.sequence[l])):
+				self.sequence[l][n] = -(self.sequence[l][n])%12
+	
 	#resetting Chain() for a new run...
 	def reset(self):
 		self.sequence_size = 2 #asuming at least the two links from de base pitch set...
 		self.building = True #otherwise we won't create anything...
 		self.is_closed = False #we know a sequence of two links is not closed...
-		self.is_closable = None #the same here...
+		self.is_closable = False #the same here...
 	
 	#building the candidates matrix...
 	def build_candidates_matrix(self, base):
@@ -165,7 +177,7 @@ class Chain():
 				row.append((n+r)%12) #we save each different state for base pcs...
 			candidates.append(row)
 		if self.base_data["invert_candidates"]: #we extend candidates matrix with inversions when possible...
-			i_base = self.pcs.invert_set(len(base), base)
+			i_base = self.pcs.invert_set(base)
 			for r in range(self.base_data["candidates_size"]):
 				row = []
 				for n in i_base:
@@ -180,8 +192,8 @@ class Chain():
 		data = {}
 		data["cardinality"] = cardinality
 		data["ordinal"] = ordinal
-		data["z_pair"] = z_pair
 		data["is_inverted"] = is_inverted
+		data["z_pair"] = z_pair
 		data["states"] = states
 		data["ordered"] = ordered_form
 		data["prime"] = prime_form
