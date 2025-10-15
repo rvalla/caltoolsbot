@@ -1,3 +1,4 @@
+import re
 import json as js
 import random as rd
 
@@ -120,12 +121,31 @@ class Messages():
 			m += str(n)
 			m += " "
 		return m[0:len(m)-1] + ")"
+
+	def sequence_to_string(self, notes):
+		m = ""
+		for n in notes:
+			m += str(n)
+			m += " "
+		return m[:len(m)-1]
 	
 	def vector_to_string(self, vector):
 		m = "["
 		for v in vector:
 			m += str(v)
 		return m +"]"
+	
+	def is_time_signature(self, string):
+		success = False
+		values = string.split("/")
+		if len(values) == 2:
+			try:
+				x = int(values[0])
+				y = int(values[1])
+				success = True
+			except:
+				pass
+		return success
 
 	def build_help_message(self, l):
 		m = ""

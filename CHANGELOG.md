@@ -2,6 +2,18 @@
 
 # musicCal: telegram bot changelog
 
+## 2025-10-14: v0.2.0 beta
+
+The **Usage()** was improved. Some errors were solved. Now the **User()** class
+save user's preferences. Note the following command changes:
+
+- **/start**: now it implements a conversations to save an artistic name and preferred time
+signature for the user. Getting ready to new tools to create music...
+- **/random**: the command to create random sequences (the fuctions needed are in **Util()**
+class.  
+- **/privacy**: Telegram ask for this one.  
+- **/admin**: A new secret commad to check usage data.  
+
 ## 2023-04-23: v0.1.5 alpha
 
 All issues with **PCS()** class are solved now. The **/pcs** commands is implemented inside a

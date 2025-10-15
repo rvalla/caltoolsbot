@@ -1,6 +1,9 @@
-start - Primero te saludo.
+start - Configurame y empecemos.
 pcs - Analizo conjuntos de grados cromáticos.
-chain - Creo secuencias de notas con un conjunto de grados crómáticos constante.
+chain - Creo secuencias de notas con pcs constante.
+matrix - Creo y opero matrices musicales.
+random - Genero material al azar.
 error - El comando para reportar un error.
 language - Decidí qué idioma uso.
-help - Puedo intentar ayudarte...
+privacy - Acerca de los datos que guardo.
+help - Puedo intentar ayudarte.
