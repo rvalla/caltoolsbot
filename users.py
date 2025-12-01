@@ -6,11 +6,13 @@ class Users():
 
     def __init__(self, output_path):
         self.output_path = output_path
+        self.omit_keys = ["matrix", "chain"]
 
     #Saving the user's data...
     def save_user_data(self, id, the_data):
         file = open(self.output_path + str(id) + ".json", "w")
-        js.dump(the_data, file)
+        filtered_data = dict((k, v) for k, v in the_data.items() if not k in self.omit_keys)
+        js.dump(the_data, file, skipkeys=True, indent=1)
         file.close()
 
     #To recover the user's data...
