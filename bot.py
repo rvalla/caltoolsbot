@@ -95,21 +95,40 @@ async def trigger_chain(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 	chat_id = update.effective_chat.id
 	logging.info(str(hide_id(chat_id)) + " starts chain conversation...")
 	await context.bot.send_message(chat_id=chat_id, text=msg.get_conversation_start(get_language(context)), parse_mode=ParseMode.HTML)
-	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("chain_1", get_language(context)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("chain_start", get_language(context)), parse_mode=ParseMode.HTML)
 	return CHAIN_S
 
 #Creating a new constant pitch class set notes sequence...
 async def get_new_chain(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 	chat_id = update.effective_chat.id
 	text = update.message.text
-	try:
-		the_chain = Chain(pcs, text, 7, 14, 3)
-		m = msg.build_chain_message(the_chain, get_language(context))
-		us.add_chain(0)
-		await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
-	except:
+	if text.lower() == "h":
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("chain_help", get_language(context)), parse_mode=ParseMode.HTML)
+	elif text.startswith("+") and "chain" in context.chat_data:
+		t = int(text[1:])
+		context.chat_data["chain"].translate(t)
+		m = msg.build_operation_chain_message(context.chat_data["chain"], get_language(context))
 		us.add_chain(1)
-		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("chain_2", get_language(context)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
+	elif text == "i" and "chain" in context.chat_data:
+		context.chat_data["chain"].invert()
+		m = msg.build_operation_chain_message(context.chat_data["chain"], get_language(context))
+		us.add_chain(1)
+		await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
+	elif text.lower() == "n" and "chain" in context.chat_data:
+		context.chat_data["chain"].run()
+		m = msg.build_new_chain_message(context.chat_data["chain"], get_language(context))
+		us.add_chain(1)
+		await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
+	else:
+		try:
+			context.chat_data["chain"] = Chain(pcs, text, 7, 14, 3)
+			m = msg.build_new_chain_message(context.chat_data["chain"], get_language(context))
+			us.add_chain(0)
+			await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
+		except:
+			us.add_chain(2)
+			await context.bot.send_message(chat_id=chat_id, text=msg.get_message("chain_nerror", get_language(context)), parse_mode=ParseMode.HTML)
 	return CHAIN_S
 
 #Starting a random functions session...

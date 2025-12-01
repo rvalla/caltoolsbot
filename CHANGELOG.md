@@ -2,6 +2,11 @@
 
 # musicCal: telegram bot changelog
 
+## 2025-12-01: v0.2.1 beta
+
+Starting to work in a new way to handle messages and translations with *regex* module. The **/chain**
+command was improved and now support operations (translation, invertion and iteration).  
+
 ## 2025-10-14: v0.2.0 beta
 
 The **Usage()** was improved. Some errors were solved. Now the **User()** class

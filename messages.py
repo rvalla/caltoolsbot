@@ -69,34 +69,37 @@ class Messages():
 			m += "- Interval vector: <b>" + self.vector_to_string(vector) + "</b>"
 		return m
 	
-	def build_chain_message(self, chain, l):
+	def build_new_chain_message(self, chain, l):
 		m = ""
+		states = []
 		if l == 0:
-			state = ""
-			if chain.is_closed:
-				state = "cerrada"
-			elif chain.is_closable:
-				state = "que puede cerrarse"
-			else:
-				state = "abierta"
-			m = "Las notas que enviaste corresponden al conjunto "
-			m += "<b>" + self.get_set_class(chain.base_data["cardinality"], chain.base_data["ordinal"],
-							chain.base_data["z_pair"]) + "</b>. "
-			m += "Logré construir una cadena " + state + " con esas notas. Te dejo acá la cadena:\n\n"
-			m += "<b>" + chain.sequence_to_string(chain.sequence) + "</b>"
+			m = self.msg_es["chain_new"]
+			states = self.msg_es["chain_states"].split(",")
 		else:
-			state = ""
-			if chain.is_closed:
-				state = "a closed"
-			elif chain.is_closable:
-				state = "a closable"
-			else:
-				state = "an open"
-			m = "The notes you send me correspond to the "
-			m += "<b>" + self.get_set_class(chain.base_data["cardinality"], chain.base_data["ordinal"],
-							chain.base_data["z_pair"]) + "</b> pitch class set. "
-			m += "I could create " + state + " notes sequence with them. Here are the notes:\n\n"
-			m += "<b>" + chain.sequence_to_string(chain.sequence) + "</b>"
+			m = self.msg_en["chain_new"]
+			states = self.msg_es["chain_states"].split(",")
+		targets = ["SET_DATA", "STATE","CHAIN"]
+		data = [self.get_set_class(chain.base_data["cardinality"], chain.base_data["ordinal"], chain.base_data["z_pair"])]
+		if chain.is_closed:
+			data.append(states[0])
+		elif chain.is_closable:
+			data.append(states[1])
+		else:
+			data.append(states[2])
+		data.append(chain.sequence_to_string(chain.sequence))
+		for k, v in zip(targets, data):
+			m = re.sub(k, v, m)
+			print(m)
+		return m
+
+	def build_operation_chain_message(self, chain, l):
+		m = ""
+		states = []
+		if l == 0:
+			m = self.msg_es["chain_op"]
+		else:
+			m = self.msg_en["chain_op"]
+		m = re.sub("CHAIN", chain.sequence_to_string(chain.sequence), m)
 		return m
 
 	def get_complete_set_class(self, cardinal, ordinal, interval, inverted, z_pair):
