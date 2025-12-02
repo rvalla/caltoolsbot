@@ -171,19 +171,7 @@ class Chain():
 	
 	#building the candidates matrix...
 	def build_candidates_matrix(self, base):
-		candidates = []
-		for r in range(self.base_data["candidates_size"]):
-			row = []
-			for n in base:
-				row.append((n+r)%12) #we save each different state for base pcs...
-			candidates.append(row)
-		if self.base_data["invert_candidates"]: #we extend candidates matrix with inversions when possible...
-			i_base = self.pcs.invert_set(base)
-			for r in range(self.base_data["candidates_size"]):
-				row = []
-				for n in i_base:
-					row.append((n+r)%12)
-				candidates.append(row)
+		candidates = self.pcs.get_states_matrix(base)
 		iter_path = [i for i in range(1,len(candidates))] #the random order to read the matrix...
 		return candidates, iter_path, len(candidates)
 
@@ -198,28 +186,7 @@ class Chain():
 		data["states"] = states
 		data["ordered"] = ordered_form
 		data["prime"] = prime_form
-		data["candidates_size"], data["invert_candidates"] = self.get_candidates_matrix_size(states)
 		return data
-
-	#deciding the candidates matrix size...
-	def get_candidates_matrix_size(self, states):
-		invert_candidates = True
-		size = 12
-		if states == 12:
-			invert_candidates = False
-		elif states == 6:
-			invert_candidates = False
-			size = 6
-		elif states == 4:
-			invert_candidates = False
-			size = 4
-		elif states == 3:
-			invert_candidates = False
-			size = 3
-		elif states == 2:
-			invert_candidates = False
-			size = 2
-		return size, invert_candidates
 	
 	#formating the sequence...
 	def sequence_to_string(self, sequence):
