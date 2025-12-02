@@ -77,8 +77,8 @@ class Messages():
 			states = self.msg_es["chain_states"].split(",")
 		else:
 			m = self.msg_en["chain_new"]
-			states = self.msg_es["chain_states"].split(",")
-		targets = ["SET_DATA", "STATE","CHAIN"]
+			states = self.msg_en["chain_states"].split(",")
+		targets = ["SET_DATA", "STATE"]
 		data = [self.get_set_class(chain.base_data["cardinality"], chain.base_data["ordinal"], chain.base_data["z_pair"])]
 		if chain.is_closed:
 			data.append(states[0])
@@ -86,11 +86,10 @@ class Messages():
 			data.append(states[1])
 		else:
 			data.append(states[2])
-		data.append(chain.sequence_to_string(chain.sequence))
 		for k, v in zip(targets, data):
 			m = re.sub(k, v, m)
 			print(m)
-		return m
+		return m, chain.sequence_to_string(chain.sequence)
 
 	def build_operation_chain_message(self, chain, l):
 		m = ""
@@ -99,8 +98,7 @@ class Messages():
 			m = self.msg_es["chain_op"]
 		else:
 			m = self.msg_en["chain_op"]
-		m = re.sub("CHAIN", chain.sequence_to_string(chain.sequence), m)
-		return m
+		return m, chain.sequence_to_string(chain.sequence)
 
 	def get_complete_set_class(self, cardinal, ordinal, interval, inverted, z_pair):
 		m = str(cardinal) + "."

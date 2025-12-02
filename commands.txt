@@ -1,6 +1,6 @@
 start - Configurame y empecemos.
 pcs - Analizo conjuntos de grados cromáticos.
-chain - Creo secuencias de notas con pcs constante.
+chain - Creo secuencias con pcs constante.
 matrix - Creo y opero matrices musicales.
 random - Genero material al azar.
 error - El comando para reportar un error.
