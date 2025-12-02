@@ -129,6 +129,45 @@ class PCS():
 			new_notes.append(-notes[i]%12)
 		return new_notes
 
+	#building the states matrix...
+	def get_states_matrix(self, notes):
+		ordinal = self.get_set_ordinal(notes)
+		states, invert_states = self.get_states_matrix_size(self.set_data[len(notes)-1][ordinal-1][1])
+		states_matrix = []
+		for r in range(states):
+			row = []
+			for n in notes:
+				row.append((n+r)%12) #we save each different state for our notes...
+			states_matrix.append(row)
+		if invert_states: #we extend states matrix with inversions when possible...
+			i_notes = self.ordered_form(self.invert_set(notes))
+			for r in range(states):
+				row = []
+				for n in i_notes:
+					row.append((n+r)%12)
+				states_matrix.append(row)
+		return states_matrix
+
+	#deciding the states matrix size...
+	def get_states_matrix_size(self, states):
+		invert_states = True
+		size = 12
+		if states == 12:
+			invert_states = False
+		elif states == 6:
+			invert_states = False
+			size = 6
+		elif states == 4:
+			invert_states = False
+			size = 4
+		elif states == 3:
+			invert_states = False
+			size = 3
+		elif states == 2:
+			invert_states = False
+			size = 2
+		return size, invert_states
+
 	#getting the interval vector...
 	def interval_vector(self, notes):
 		vector = [0,0,0,0,0,0]
@@ -211,6 +250,23 @@ class PCS():
 		m += self.notes_to_string(ordered_form) + " " + self.notes_to_string(prime_form) + "\n"
 		m += self.vector_to_string(self.interval_vector(ordered_form)) + " |" + str(states) + "|\n"
 		return m
+
+	#formating a states matrix...
+	def states_to_string(self, states_matrix):
+		m = ""
+		if len(states_matrix)%2 == 0:
+			half = len(states_matrix)//2
+			for r in range(half):
+				m += self.notes_to_string(states_matrix[r]) + "\t\t"
+				m += self.notes_to_string(states_matrix[r+half])
+				if r < len(states_matrix)//2 - 1:
+					m += "\n"
+		else:
+			for r in range(len(states_matrix)):
+				m += self.notes_to_string(states_matrix[r])
+				if r < len(states_matrix) - 1:
+					m += "\n"
+		return m			
 	
 	#the class prints itself...
 	def __str__(self):
