@@ -2,10 +2,15 @@
 
 # musicCal: telegram bot changelog
 
-## 2025-12-01: v0.2.1 beta
+## 2025-12-10: v0.2.2 beta
+
+Updating **CAlpytools** again to solve an error en **Chain()**.  
+
+## 2025-12-02: v0.2.1 beta
 
 Starting to work in a new way to handle messages and translations with *regex* module. The **/chain**
 command was improved and now support operations (translation, invertion and iteration).  
+**Calpytools** was updated.   
 
 ## 2025-10-14: v0.2.0 beta
 

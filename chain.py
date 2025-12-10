@@ -48,7 +48,7 @@ class Chain():
 		link = self.new_link(link_a, link_b)
 		if link == None:
 			self.degrading += 1
-			return link_a #we fallback if we didn't find any new link...
+			return link_a.copy() #we fallback if we didn't find any new link...
 		else:
 			return link
 	

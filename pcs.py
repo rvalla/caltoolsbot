@@ -1,9 +1,9 @@
 class PCS():
 	"A tool to recognize pitch class sets"
 
-	def __init__(self):
+	def __init__(self, prime_forms_path="data/forte_prime_forms.csv"):
 		#We load prime forms and data related to Z pairs and invariance...
-		self.prime_forms, self.set_data = self.load_prime_forms()
+		self.prime_forms, self.set_data = self.load_prime_forms(prime_forms_path)
 	
 	#we ask for all pitch class set relevant information...
 	def get_set_info(self, string_notes):
@@ -227,10 +227,10 @@ class PCS():
 		return m +"]"
 
 	#loading the prime forms database...
-	def load_prime_forms(self):
+	def load_prime_forms(self, prime_forms_path):
 		prime_forms = [[] for i in range(12)]
 		set_data = [[] for i in range(12)]
-		data = open("data/forte_prime_forms.csv").readlines()[1:] #openning our database file...
+		data = open(prime_forms_path).readlines()[1:] #openning our database file...
 		for l in data:
 			file_line = l.split(";")
 			prime_forms[int(file_line[0])-1].append(self.string_to_notes(file_line[2]))
