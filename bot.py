@@ -38,8 +38,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 	chat_id = update.effective_chat.id
 	logging.info(str(hide_id(chat_id)) + " started the bot...")
 	us.add_start()
-	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("start_1", get_language(context)), parse_mode=ParseMode.HTML)
-	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("start_2", get_language(context)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("start_start", get_language(context)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("start_name", get_language(context)), parse_mode=ParseMode.HTML)
 	return START_AN
 
 #Saving the user's artistic name...
@@ -47,7 +47,7 @@ async def save_artistic_name(update: Update, context: ContextTypes.DEFAULT_TYPE)
 	chat_id = update.effective_chat.id
 	m = update.message.text
 	context.chat_data["name"] = m
-	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("start_3", get_language(context)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("start_ts", get_language(context)), parse_mode=ParseMode.HTML)
 	return START_TS
 
 #Saving the user's prefered time signature...
@@ -57,10 +57,10 @@ async def save_prefered_time_signature(update: Update, context: ContextTypes.DEF
 	if msg.is_time_signature(m):
 		context.chat_data["t_signature"] = m
 		users.save_user_data(chat_id, context.chat_data)
-		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("start_5", get_language(context)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("start_end", get_language(context)), parse_mode=ParseMode.HTML)
 		return ConversationHandler.END
 	else:
-		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("start_4", get_language(context)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("start_error", get_language(context)), parse_mode=ParseMode.HTML)
 		return START_TS
 
 #Starting a pitch class set analysis session...
@@ -68,7 +68,7 @@ async def trigger_pcs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
 	chat_id = update.effective_chat.id
 	logging.info(str(hide_id(chat_id)) + " starts pcs conversation...")
 	await context.bot.send_message(chat_id=chat_id, text=msg.get_conversation_start(get_language(context)), parse_mode=ParseMode.HTML)
-	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("pcs_1", get_language(context)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("pcs_start", get_language(context)), parse_mode=ParseMode.HTML)
 	return PCS_S
 
 #Analyzing pitch class sets sent by the user...
@@ -84,10 +84,10 @@ async def get_pcs_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
 			await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
 		else:
 			us.add_pcs(1)
-			await context.bot.send_message(chat_id=chat_id, text=msg.get_message("pcs_2", get_language(context)), parse_mode=ParseMode.HTML)
+			await context.bot.send_message(chat_id=chat_id, text=msg.get_message("pcs_pcserror", get_language(context)), parse_mode=ParseMode.HTML)
 	except:
 		us.add_pcs(2)
-		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("pcs_3", get_language(context)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("pcs_nerror", get_language(context)), parse_mode=ParseMode.HTML)
 	return PCS_S
 
 #Starting a constant pitch class set sequence creation session...
@@ -140,7 +140,7 @@ async def trigger_random(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 	chat_id = update.effective_chat.id
 	logging.info(str(hide_id(chat_id)) + " starts random conversation...")
 	await context.bot.send_message(chat_id=chat_id, text=msg.get_conversation_start(get_language(context)), parse_mode=ParseMode.HTML)
-	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("random_1", get_language(context)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("random_size", get_language(context)), parse_mode=ParseMode.HTML)
 	return RANDOM_S
 
 #Saving the sequence size preference...
@@ -150,11 +150,11 @@ async def set_random_size(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 	try:
 		size = int(text)
 		context.chat_data["random_size"] = size
-		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("random_2", get_language(context)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("random_dice", get_language(context)), parse_mode=ParseMode.HTML)
 		return RANDOM_D
 	except:
 		us.add_random(1)
-		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("random_5", get_language(context)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("random_error", get_language(context)), parse_mode=ParseMode.HTML)
 		return RANDOM_S
 
 #Saving the dice size preference...
@@ -166,20 +166,16 @@ async def set_dice_size(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 		context.chat_data["random_dice"] = size
 		keyboard = random_keyboard(get_language(context))
 		reply = InlineKeyboardMarkup(keyboard)
-		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("random_3", get_language(context)), reply_markup=reply, parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("random_distribution", get_language(context)), reply_markup=reply, parse_mode=ParseMode.HTML)
 		return RANDOM_B
 	except:
 		us.add_random(1)
-		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("random_5", get_language(context)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("random_error", get_language(context)), parse_mode=ParseMode.HTML)
 		return RANDOM_D
 
 #Building the random keyboard...
 def random_keyboard(language: int):
-	tags = [] 
-	if language == 0:
-		tags = ["Un dado", "Menor de dos", "Suma de dos", "Suma de tres", "Con lista"]
-	elif language == 1:
-		tags = ["A dice", "Minor of two", "Sum of two", "Sum of three", "With list"]
+	tags = msg.get_keyboard_tags("random_keyboard", get_language(context))
 	keyboard = [[InlineKeyboardButton(text=tags[0], callback_data="r_0"), InlineKeyboardButton(text=tags[1], callback_data="r_1")],
 							[InlineKeyboardButton(text=tags[2], callback_data="r_2"), InlineKeyboardButton(text=tags[3], callback_data="r_3")],
 							[InlineKeyboardButton(text=tags[4], callback_data="r_4")]]
@@ -225,7 +221,7 @@ async def random_conversation_button_click(update: Update, context: ContextTypes
 		await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
 		return RANDOM_B
 	elif selection == 4:
-		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("random_4", get_language(context)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("random_list", get_language(context)), parse_mode=ParseMode.HTML)
 		return RANDOM_C
 
 #Starting a music creation session...
@@ -279,7 +275,7 @@ async def trigger_error_submit(update: Update, context: ContextTypes.DEFAULT_TYP
 	chat_id = update.effective_chat.id
 	logging.info(str(hide_id(chat_id)) + " wants to report an error...")
 	await context.bot.send_message(chat_id=chat_id, text=msg.get_apology(get_language(context)), parse_mode=ParseMode.HTML)
-	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("submit_error_1", get_language(context)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("submit_error_command", get_language(context)), parse_mode=ParseMode.HTML)
 	return ERROR_1
 
 #Saving error related command...
@@ -287,7 +283,7 @@ async def report_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 	chat_id = update.effective_chat.id
 	m = update.message.text
 	context.chat_data["error_command"] = m
-	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("submit_error_2", get_language(context)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("submit_error_about", get_language(context)), parse_mode=ParseMode.HTML)
 	return ERROR_2
 
 #Saving error description...
@@ -300,7 +296,7 @@ async def report_error(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
 	us.save_error_report(m, m2, str(hide_id(chat_id)))
 	admin_msg = "Error reported:\n-command: " + m + "\n-description: " + m2
 	await context.bot.send_message(chat_id=config["admin_id"], text=admin_msg, parse_mode=ParseMode.HTML)
-	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("submit_error_3", get_language(context)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("submit_error_end", get_language(context)), parse_mode=ParseMode.HTML)
 	return ConversationHandler.END
 
 #Starting admin session...
@@ -359,7 +355,7 @@ async def select_language(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 	keyboard = [[InlineKeyboardButton(text="Español", callback_data="l_0"),
 				InlineKeyboardButton(text="English", callback_data="l_1")]]
 	reply = InlineKeyboardMarkup(keyboard)
-	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("language", get_language(context)), reply_markup=reply, parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("language_start", get_language(context)), reply_markup=reply, parse_mode=ParseMode.HTML)
 
 #Setting language configuration for actual user...
 async def set_language(update: Update, context: ContextTypes.DEFAULT_TYPE, query) -> None:
@@ -368,12 +364,13 @@ async def set_language(update: Update, context: ContextTypes.DEFAULT_TYPE, query
 		logging.info("English is the language selected by " + str(hide_id(chat_id)))
 		context.chat_data["language"] = 1
 		us.add_language(1)
-		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("language2", get_language(context)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("language_warning", get_language(context)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("language_end", get_language(context)), parse_mode=ParseMode.HTML)
 	else:
 		logging.info("Spanish is the language selected by " + str(hide_id(chat_id)))
 		context.chat_data["language"] = 0
 		us.add_language(0)
-		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("language3", get_language(context)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("language_end", get_language(context)), parse_mode=ParseMode.HTML)
 
 #Handling default clicks on InlineKeyboardButtons...
 async def default_button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

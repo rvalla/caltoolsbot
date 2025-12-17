@@ -22,6 +22,9 @@ class Messages():
 			return self.msg_en[key]
 		else:
 			return self.msg_es[key]
+
+	def get_keyboard_tags(self, key, l):
+		return self.get_message(key, l).split(",")
 	
 	def get_conversation_start(self, l):
 		if l == 0:
