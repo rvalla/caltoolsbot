@@ -52,28 +52,31 @@ class Messages():
 	
 	def build_pcs_message(self, c, o, i, inverted, z_pair, states, ordered, prime, vector, l):
 		m = ""
+		z_string = " "
+		targets = ["SET", "Z_PAIR", "STATES", "ORDERED_FORM", "PRIME_FORM", "INTERVAL_VECTOR"]
 		if l == 0:
-			m = "El conjunto de alturas que enviaste corresponde al conjunto "
-			m += "<b>" + self.get_complete_set_class(c, o, i, inverted, z_pair) + "</b>. "
+			m = self.msg_es["pcs_info"]
 			if not z_pair == -1:
-				m += "Su par Z es el <b>" + self.get_set_class(c,z_pair,z_pair) + "</b>. "
-			m += "Existen " + str(states) + " estados diferentes para este conjunto.\n\n"
-			m += "- Forma ordenada: <b>" + self.notes_to_string(ordered) + "</b>\n"
-			m += "- Forma prima: <b>" + self.notes_to_string(prime) + "</b>\n"
-			m += "- Vector interválico: <b>" + self.vector_to_string(vector) + "</b>"
+				z_string = self.msg_es["pcs_zpair"]
 		else:
-			m = "The notes you have sent correspond to the following pitch class set: "
-			m += "<b>" + self.get_complete_set_class(c, o, i, inverted, z_pair) + "</b>. "
+			m = self.msg_en["pcs_info"]
 			if not z_pair == -1:
-				m += "Its Z related set is the <b>" + self.get_set_class(c,z_pair,z_pair) + "</b>. "
-			m += "There are " + str(states) + " different states for this set.\n\n"
-			m += "- Ordered form: <b>" + self.notes_to_string(ordered) + "</b>\n"
-			m += "- Prime form: <b>" + self.notes_to_string(prime) + "</b>\n"
-			m += "- Interval vector: <b>" + self.vector_to_string(vector) + "</b>"
+				z_string = self.msg_en["pcs_zpair"]
+		if len(z_string) > 1:
+			z_string = re.sub("SET", self.get_set_class(c, z_pair, z_pair), z_string)
+		data = [self.get_complete_set_class(c, o, i, inverted, z_pair)]
+		data.append(z_string)
+		data.append(str(states))
+		data.append(self.notes_to_string(ordered))
+		data.append(self.notes_to_string(prime))
+		data.append(self.vector_to_string(vector))
+		for k, v in zip(targets, data):
+			m = re.sub(k, v, m)
 		return m
 	
 	def build_new_chain_message(self, chain, l):
 		m = ""
+		targets = ["SET_DATA", "STATE"]
 		states = []
 		if l == 0:
 			m = self.msg_es["chain_new"]
@@ -81,7 +84,6 @@ class Messages():
 		else:
 			m = self.msg_en["chain_new"]
 			states = self.msg_en["chain_states"].split(",")
-		targets = ["SET_DATA", "STATE"]
 		data = [self.get_set_class(chain.base_data["cardinality"], chain.base_data["ordinal"], chain.base_data["z_pair"])]
 		if chain.is_closed:
 			data.append(states[0])
@@ -91,7 +93,6 @@ class Messages():
 			data.append(states[2])
 		for k, v in zip(targets, data):
 			m = re.sub(k, v, m)
-			print(m)
 		return m, chain.sequence_to_string(chain.sequence)
 
 	def build_operation_chain_message(self, chain, l):

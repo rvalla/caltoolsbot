@@ -14,6 +14,7 @@ class Usage():
 		self.last_save = dt.now().replace(hour=0, minute=0, second=0, microsecond=0)
 		self.start = 0
 		self.pcs = [0,0,0] #success, wrong set, wrong input...
+		self.allstates = [0,0] #success, error...
 		self.chain = [0,0,0] #success, operations, errors...
 		self.matrix = [0,0,0] #new matrices, operations, errors...
 		self.random = [0,0] #success, errors...
@@ -30,6 +31,7 @@ class Usage():
 		m = "<b>Usage data:</b>" + "\n" + \
 			"start: " + str(self.start) + "\n" + \
 			"pcs: " + str(self.pcs) + "\n" + \
+			"allstates: " + str(self.allstates) + "\n" + \
 			"chain: " + str(self.chain) + "\n" + \
 			"matrix: " + str(self.matrix) + "\n" + \
 			"random: " + str(self.random) + "\n" + \
@@ -57,6 +59,7 @@ class Usage():
 		line = date + ";"
 		line += str(self.start) + ";"
 		line += self.list_to_csv_format(self.pcs)
+		line += self.list_to_csv_format(self.allstates)
 		line += self.list_to_csv_format(self.chain)
 		line += self.list_to_csv_format(self.matrix)
 		line += self.list_to_csv_format(self.random)
@@ -90,6 +93,11 @@ class Usage():
 	def add_pcs(self, key):
 		self.check_data_interval()
 		self.pcs[key] += 1
+
+	#Registering a new pcs...
+	def add_allstates(self, key):
+		self.check_data_interval()
+		self.allstates[key] += 1
 	
 	#Registering a new chain...
 	def add_chain(self, key):
@@ -146,8 +154,8 @@ class Usage():
 		file = open(self.errors_path, "a")
 		t = dt.now()
 		date = str(t.year) + "-" + str(t.month) + "-" + str(t.day)
-		file.write(date)
-		file.write(command)
-		file.write(description)
+		file.write(date + ";")
+		file.write(command + ";")
+		file.write(description + ";")
 		file.write(user + "\n")
 		file.close()

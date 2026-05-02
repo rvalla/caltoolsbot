@@ -30,7 +30,7 @@ pcs = PCS() #A class to analyze pitch class sets...
 users = Users("data/users/") #A class to save user's configuration...
 ut = Util() #Some useful functions...
 #mus = Music() #A class to create experimental music...
-START_AN, START_TS, PCS_S, CHAIN_S, RANDOM_S, RANDOM_D, RANDOM_B, RANDOM_C, ERROR_1, ERROR_2, ADMIN = range(11) #The general conversation states...
+START_AN, START_TS, PCS, ALLSTATES, CHAIN, RANDOM_S, RANDOM_D, RANDOM_B, RANDOM_C, ERROR_1, ERROR_2, ADMIN = range(12) #The general conversation states...
 #CP_T, CP_M, CP_D = range(3) #The music conversation states...
 
 #Welcome message for people who start the bot...
@@ -69,7 +69,7 @@ async def trigger_pcs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
 	logging.info(str(hide_id(chat_id)) + " starts pcs conversation...")
 	await context.bot.send_message(chat_id=chat_id, text=msg.get_conversation_start(get_language(context)), parse_mode=ParseMode.HTML)
 	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("pcs_start", get_language(context)), parse_mode=ParseMode.HTML)
-	return PCS_S
+	return PCS
 
 #Analyzing pitch class sets sent by the user...
 async def get_pcs_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -88,7 +88,29 @@ async def get_pcs_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
 	except:
 		us.add_pcs(2)
 		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("pcs_nerror", get_language(context)), parse_mode=ParseMode.HTML)
-	return PCS_S
+	return PCS
+
+#Starting a pitch class set all states session...
+async def trigger_allstates(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+	chat_id = update.effective_chat.id
+	logging.info(str(hide_id(chat_id)) + " starts allstates conversation...")
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_conversation_start(get_language(context)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("allstates_start", get_language(context)), parse_mode=ParseMode.HTML)
+	return ALLSTATES
+
+#Creating a pcs all states matrix to send...
+async def get_all_states(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+	chat_id = update.effective_chat.id
+	text = update.message.text
+	try:
+		allstates_matrix = pcs.states_to_string(pcs.get_states_matrix(pcs.string_to_notes(text)))
+		us.add_allstates(0)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("allstates_msg", get_language(context)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=allstates_matrix, parse_mode=ParseMode.HTML)
+	except:
+		us.add_allstates(1)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("allstates_error", get_language(context)), parse_mode=ParseMode.HTML)
+	return ALLSTATES
 
 #Starting a constant pitch class set sequence creation session...
 async def trigger_chain(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -96,7 +118,7 @@ async def trigger_chain(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 	logging.info(str(hide_id(chat_id)) + " starts chain conversation...")
 	await context.bot.send_message(chat_id=chat_id, text=msg.get_conversation_start(get_language(context)), parse_mode=ParseMode.HTML)
 	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("chain_start", get_language(context)), parse_mode=ParseMode.HTML)
-	return CHAIN_S
+	return CHAIN
 
 #Creating a new constant pitch class set notes sequence...
 async def get_new_chain(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -133,7 +155,7 @@ async def get_new_chain(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 		except:
 			us.add_chain(2)
 			await context.bot.send_message(chat_id=chat_id, text=msg.get_message("chain_nerror", get_language(context)), parse_mode=ParseMode.HTML)
-	return CHAIN_S
+	return CHAIN
 
 #Starting a random functions session...
 async def trigger_random(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -425,13 +447,15 @@ def build_general_conversation_handler():
 	print("Building general conversation handler...", end="\n")
 	handler = ConversationHandler(
 		entry_points=[CommandHandler("start", start), CommandHandler("pcs", trigger_pcs),
-					CommandHandler("chain", trigger_chain), CommandHandler("random", trigger_random),
+					CommandHandler("allstates", trigger_allstates), CommandHandler("chain", trigger_chain),
+					CommandHandler("matrix", trigger_matrix), CommandHandler("random", trigger_random),
 					CommandHandler("admin", trigger_admin), CommandHandler("error", trigger_error_submit)],
 		states={
 			START_AN: [MessageHandler(filters.TEXT & ~filters.COMMAND, save_artistic_name)],
 			START_TS: [MessageHandler(filters.TEXT & ~filters.COMMAND, save_prefered_time_signature)],
-			PCS_S: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_pcs_info)],
-			CHAIN_S: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_new_chain)],
+			PCS: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_pcs_info)],
+			ALLSTATES: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_all_states)],
+			CHAIN: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_new_chain)],
 			RANDOM_S: [MessageHandler(filters.TEXT & ~filters.COMMAND, set_random_size)],
 			RANDOM_D: [MessageHandler(filters.TEXT & ~filters.COMMAND, set_dice_size)],
 			RANDOM_B: [MessageHandler(filters.TEXT & ~filters.COMMAND, shuffle_message),

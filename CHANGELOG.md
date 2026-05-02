@@ -2,9 +2,16 @@
 
 # musicCal: telegram bot changelog
 
+## 2026-05-02: v0.2.3 beta
+
+Finishing the new way to handle messages and translations with *regex*. All messages
+come from *assets/text/language/messages.json* now. New **/allstates** command to get
+the list of different states for a pitch class set. Adding *;* in *save_error_report()*
+command in **Usage()**.  
+
 ## 2025-12-10: v0.2.2 beta
 
-Updating **CAlpytools** again to solve an error en **Chain()**.  
+Updating **CAlpytools** again to solve an error in **Chain()**.  
 
 ## 2025-12-02: v0.2.1 beta
 
