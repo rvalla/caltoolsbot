@@ -206,9 +206,13 @@ class Matrix():
 		self.h = h
 		self.w = w
 
-	#function to get information in a cell...
+	#function to get notes from a cell in random order...
 	def get_cell(self, r, c):
 		rd.shuffle(self.data[self.r_status[r]][self.c_status[c]])
+		return self.data[self.r_status[r]][self.c_status[c]]
+
+	#function to get notes from a cell without shuffling notes...
+	def get_static_cell(self, r, c):
 		return self.data[self.r_status[r]][self.c_status[c]]
 
 	#function to set a matrix cell...

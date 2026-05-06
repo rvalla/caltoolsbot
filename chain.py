@@ -152,15 +152,67 @@ class Chain():
 	#function to move the chain in pitch space...
 	def translate(self, t):
 		for l in range(self.sequence_size):
-			for n in range(len(self.sequence[l])):
-				self.sequence[l][n] = (self.sequence[l][n] + t)%12
+				self.translate_link(t, self.sequence[l])
+
+	#fuction to move a link in pitch space...
+	def translate_link(self, t, link):
+		for n in range(len(link)):
+			link[n] = (link[n] + t)%12
+
+	#function to multiply the chain elements...
+	def multiply(self, f):
+		for l in range(self.sequence_size):
+			self.multiply_link(f, self.sequence[l])
+		self.base_data = self.get_base_data(self.notes_to_string(self.sequence[0] + self.sequence[1]))
+		self.base = self.base_data["ordered"]
+
+	#function to multiply elements in a link...
+	def multiply_link(self, f, link):
+		for n in range(len(link)):
+			link[n] = (link[n] * f)%12
 
 	#function to invert the chain in pitch space...
 	def invert(self):
 		for l in range(self.sequence_size):
 			for n in range(len(self.sequence[l])):
 				self.sequence[l][n] = -(self.sequence[l][n])%12
-	
+
+	#function to close the chain...
+	def close(self):
+		if not self.is_closed:
+			if self.is_closable:
+				first_link = self.sequence[0]
+				last_link = self.sequence[self.sequence_size - 1]
+				d = self.get_distance_between_extremes(first_link, last_link)
+				r = 0 #We track the number of iterations
+				s = self.sequence_size - 1
+				while not self.are_equal(first_link, last_link):
+					for l in range((s*r)+1, self.sequence_size):
+						new_link = self.sequence[l].copy()
+						self.translate_link(d, new_link)
+						self.sequence.append(new_link)
+						last_link = new_link
+					r += 1
+					self.sequence_size += s
+			else:
+				p = 0
+				first_link = self.sequence[0]
+				for l in range(2, self.sequence_size + 1):
+					new_link = self.sequence[self.sequence_size-l]
+					self.sequence.append(new_link.copy())
+					p += 1
+					if self.are_equal(first_link, new_link):
+						break
+				self.sequence_size += p
+		self.is_closed = True
+		self.is_closable = True
+
+	#function to know distance between first and last links in a closable chain...
+	def get_distance_between_extremes(self, first_link, last_link):
+		start = self.pcs.ordered_form(first_link)
+		end = self.pcs.ordered_form(last_link)
+		return (end[0] - start[0]) % 12
+ 
 	#resetting Chain() for a new run...
 	def reset(self):
 		self.degrading = 0 #we start again, so degrading is 0...
@@ -217,6 +269,8 @@ class Chain():
 	#setting up a certain Chain() from a string...
 	def set_chain(self, string_notes):
 		string_links = string_notes.split("-")
+		self.is_closed = False
+		self.is_closable = False
 		self.base_data = self.get_base_data(string_links[0] + string_links[1])
 		self.base = self.base_data["ordered"]
 		self.candidates, self.iter_path, self.candidates_size = self.build_candidates_matrix(self.base)
