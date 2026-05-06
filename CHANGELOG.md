@@ -2,6 +2,17 @@
 
 # musicCal: telegram bot changelog
 
+## 2026-05-05: v0.3.0 beta
+
+Updating **Calpytools** to incorporate new functions in **Chain()**.  
+New */matrix* command to build and operate musical matrices. Integration of **Calpytools Matrix()**
+class is almost full. I decided to avoid controlled swap operations like the ones in
+[matrix_cmp.py](https://gitlab.com/musicaltools/calpytools/-/blob/themoststable/matrix_cmd.py). The
+current matrix and the history of operations is stored in a text file that can be send to the user.  
+New *multiply* and *close* operation in */chain* conversation. Now the message with the notes sequence
+is formated as code.    
+Error corrected in *random_keyboard()* in *bot.py*.  
+
 ## 2026-05-02: v0.2.3 beta
 
 Finishing the new way to handle messages and translations with *regex*. All messages
@@ -11,7 +22,7 @@ command in **Usage()**.
 
 ## 2025-12-10: v0.2.2 beta
 
-Updating **CAlpytools** again to solve an error in **Chain()**.  
+Updating **Calpytools** again to solve an error in **Chain()**.  
 
 ## 2025-12-02: v0.2.1 beta
 

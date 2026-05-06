@@ -12,6 +12,7 @@ from usage import Usage
 from messages import Messages
 from pcs import PCS
 from chain import Chain
+from matrix import Matrix
 #from music import Music
 from users import Users
 from util import Util
@@ -30,7 +31,7 @@ pcs = PCS() #A class to analyze pitch class sets...
 users = Users("data/users/") #A class to save user's configuration...
 ut = Util() #Some useful functions...
 #mus = Music() #A class to create experimental music...
-START_AN, START_TS, PCS, ALLSTATES, CHAIN, RANDOM_S, RANDOM_D, RANDOM_B, RANDOM_C, ERROR_1, ERROR_2, ADMIN = range(12) #The general conversation states...
+START_AN, START_TS, PCS, ALLSTATES, CHAIN, MATRIX, RANDOM_S, RANDOM_D, RANDOM_B, RANDOM_C, ERROR_1, ERROR_2, ADMIN = range(13) #The general conversation states...
 #CP_T, CP_M, CP_D = range(3) #The music conversation states...
 
 #Welcome message for people who start the bot...
@@ -106,7 +107,7 @@ async def get_all_states(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 		allstates_matrix = pcs.states_to_string(pcs.get_states_matrix(pcs.string_to_notes(text)))
 		us.add_allstates(0)
 		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("allstates_msg", get_language(context)), parse_mode=ParseMode.HTML)
-		await context.bot.send_message(chat_id=chat_id, text=allstates_matrix, parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text="<pre>" + allstates_matrix + "</pre>", parse_mode=ParseMode.HTML)
 	except:
 		us.add_allstates(1)
 		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("allstates_error", get_language(context)), parse_mode=ParseMode.HTML)
@@ -120,21 +121,42 @@ async def trigger_chain(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("chain_start", get_language(context)), parse_mode=ParseMode.HTML)
 	return CHAIN
 
-#Creating a new constant pitch class set notes sequence...
+#Creating a new constant pitch class set notes sequence or operating it...
 async def get_new_chain(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 	chat_id = update.effective_chat.id
 	text = update.message.text
 	if text.lower() == "h":
 		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("chain_help", get_language(context)), parse_mode=ParseMode.HTML)
 	elif text.startswith("+") and "chain" in context.chat_data:
-		t = int(text[1:])
-		context.chat_data["chain"].translate(t)
+		try:
+			t = int(text[1:])
+			context.chat_data["chain"].translate(t)
+			m, c = msg.build_operation_chain_message(context.chat_data["chain"], get_language(context))
+			us.add_chain(1)
+			await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
+			await context.bot.send_message(chat_id=chat_id, text=c, parse_mode=ParseMode.HTML)
+		except:
+			us.add_chain(2)
+			await context.bot.send_message(chat_id=chat_id, text=msg.get_message("chain_operror", get_language(context)), parse_mode=ParseMode.HTML)
+	elif text.startswith("x") and "chain" in context.chat_data:
+		try:
+			f = int(text[1:])
+			context.chat_data["chain"].multiply(f)
+			m, c = msg.build_operation_chain_message(context.chat_data["chain"], get_language(context))
+			us.add_chain(1)
+			await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
+			await context.bot.send_message(chat_id=chat_id, text=c, parse_mode=ParseMode.HTML)
+		except:
+			us.add_chain(2)
+			await context.bot.send_message(chat_id=chat_id, text=msg.get_message("chain_operror", get_language(context)), parse_mode=ParseMode.HTML)
+	elif text.lower() == "i" and "chain" in context.chat_data:
+		context.chat_data["chain"].invert()
 		m, c = msg.build_operation_chain_message(context.chat_data["chain"], get_language(context))
 		us.add_chain(1)
 		await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
 		await context.bot.send_message(chat_id=chat_id, text=c, parse_mode=ParseMode.HTML)
-	elif text.lower() == "i" and "chain" in context.chat_data:
-		context.chat_data["chain"].invert()
+	elif text.lower() == "c" and "chain" in context.chat_data:
+		context.chat_data["chain"].close()
 		m, c = msg.build_operation_chain_message(context.chat_data["chain"], get_language(context))
 		us.add_chain(1)
 		await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
@@ -156,6 +178,219 @@ async def get_new_chain(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 			us.add_chain(2)
 			await context.bot.send_message(chat_id=chat_id, text=msg.get_message("chain_nerror", get_language(context)), parse_mode=ParseMode.HTML)
 	return CHAIN
+
+#Starting a constant pitch class set sequence creation session...
+async def trigger_matrix(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+	chat_id = update.effective_chat.id
+	logging.info(str(hide_id(chat_id)) + " starts matrix conversation...")
+	keyboard = matrix_keyboard(get_language(context))
+	reply = InlineKeyboardMarkup(keyboard)
+	context.chat_data["matrix_status"] = 0
+	context.chat_data["matrix_input"] = []
+	context.chat_data["matrix"] = Matrix(12, "")
+	us.add_matrix(0)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_conversation_start(get_language(context)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_start", get_language(context)), reply_markup=reply, parse_mode=ParseMode.HTML)
+	return MATRIX
+
+#Creating a new matrix or operating it...
+async def get_new_matrix(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+	chat_id = update.effective_chat.id
+	text = update.message.text
+	if text.lower() == "h":
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_help", get_language(context)), parse_mode=ParseMode.HTML)
+	elif text.lower() == "n":
+		await trigger_matrix(update, context)
+	else:
+		if context.chat_data["matrix_status"] == 3 and "matrix" in context.chat_data:
+			await matrix_operation(update, context, chat_id, text)
+		elif context.chat_data["matrix_status"] == 0:
+			await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_button", get_language(context)), parse_mode=ParseMode.HTML)
+		else:
+			await build_matrix(update, context, chat_id, text)
+	return MATRIX
+
+#Building the selected matrix...
+async def build_matrix(update: Update, context: ContextTypes.DEFAULT_TYPE, chat_id, text) -> int:
+	#We processed the first input. Only Type 1 and Chain matrix will be built. Type 2 and Cycle needs another input...
+	if context.chat_data["matrix_status"] == 1:
+		if context.chat_data["matrix_type"] == 0:
+			try:
+				notes = context.chat_data["matrix"].get_notes(text)
+				if len(notes) > 0:
+					context.chat_data["matrix"].build_type_one(notes)
+					context.chat_data["matrix_status"] = 3
+					users.new_matrix(chat_id, msg.get_message("matrix_header", get_language(context)), context.chat_data["matrix"].matrix_to_string())
+					await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_success", get_language(context)), parse_mode=ParseMode.HTML)
+					await context.bot.send_message(chat_id=chat_id, text="<pre>" + context.chat_data["matrix"].matrix_to_string() + "</pre>", parse_mode=ParseMode.HTML)
+				else:
+					await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_error", get_language(context)), parse_mode=ParseMode.HTML)
+					us.add_matrix(2)
+			except Exception as e:
+				await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_error", get_language(context)), parse_mode=ParseMode.HTML)
+				us.add_matrix(2)
+				print(e)
+		elif context.chat_data["matrix_type"] == 1:
+			try:
+				notes = context.chat_data["matrix"].get_notes(text)
+				if len(notes) > 0:
+					context.chat_data["matrix_input"].append(notes)
+					context.chat_data["matrix_status"] = 2
+					await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_set2", get_language(context)), parse_mode=ParseMode.HTML)
+				else:
+					await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_error", get_language(context)), parse_mode=ParseMode.HTML)
+					us.add_matrix(2)
+			except Exception as e:
+				await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_error", get_language(context)), parse_mode=ParseMode.HTML)
+				us.add_matrix(2)
+				print(e)
+		elif context.chat_data["matrix_type"] == 2:
+			try:
+				context.chat_data["matrix_input"].append(text)
+				context.chat_data["matrix"].from_closed_chain(context.chat_data["matrix_input"][0])
+				context.chat_data["matrix_status"] = 3
+				users.new_matrix(chat_id, msg.get_message("matrix_header", get_language(context)), context.chat_data["matrix"].matrix_to_string())
+				await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_success", get_language(context)), parse_mode=ParseMode.HTML)
+				await context.bot.send_message(chat_id=chat_id, text="<pre>" + context.chat_data["matrix"].matrix_to_string() + "</pre>", parse_mode=ParseMode.HTML)
+			except Exception as e:
+				await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_error", get_language(context)), parse_mode=ParseMode.HTML)
+				us.add_matrix(2)
+				print(e)
+		elif context.chat_data["matrix_type"] == 3:
+			try:
+				context.chat_data["matrix_input"].append(text)
+				context.chat_data["matrix_status"] = 2
+				await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_cycledistance", get_language(context)), parse_mode=ParseMode.HTML)
+			except Exception as e:
+				await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_error", get_language(context)), parse_mode=ParseMode.HTML)
+				us.add_matrix(2)
+				print(e)
+	#Now we can built Type 2 and Translation Cycle matrices... 
+	elif context.chat_data["matrix_status"] == 2:
+		if context.chat_data["matrix_type"] == 1:
+			try:
+				notes = context.chat_data["matrix"].get_notes(text)
+				if len(notes) > 0: 
+					context.chat_data["matrix"].build_type_two(context.chat_data["matrix_input"][0], notes)
+					context.chat_data["matrix_status"] = 3
+					users.new_matrix(chat_id, msg.get_message("matrix_header", get_language(context)), context.chat_data["matrix"].matrix_to_string())
+					await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_success", get_language(context)), parse_mode=ParseMode.HTML)
+					await context.bot.send_message(chat_id=chat_id, text="<pre>" + context.chat_data["matrix"].matrix_to_string() + "</pre>", parse_mode=ParseMode.HTML)
+				else:
+					await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_error", get_language(context)), parse_mode=ParseMode.HTML)
+					us.add_matrix(2)
+			except Exception as e:
+				await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_error", get_language(context)), parse_mode=ParseMode.HTML)
+				us.add_matrix(2)
+				print(e)
+		elif context.chat_data["matrix_type"] == 3:
+			try:
+				context.chat_data["matrix_input"].append(int(text))
+				context.chat_data["matrix"].translation_cycle(context.chat_data["matrix_input"][0], context.chat_data["matrix_input"][1])
+				context.chat_data["matrix_status"] = 3
+				users.new_matrix(chat_id, msg.get_message("matrix_header", get_language(context)), context.chat_data["matrix"].matrix_to_string())
+				await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_success", get_language(context)), parse_mode=ParseMode.HTML)
+				await context.bot.send_message(chat_id=chat_id, text="<pre>" + context.chat_data["matrix"].matrix_to_string() + "</pre>", parse_mode=ParseMode.HTML)
+			except Exception as e:
+				await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_error", get_language(context)), parse_mode=ParseMode.HTML)
+				us.add_matrix(2)
+				print(e)
+	return MATRIX
+
+#Executing operations in a matrix...
+async def matrix_operation(update: Update, context: ContextTypes.DEFAULT_TYPE, chat_id, text) -> int:
+	if text.startswith("+"):
+		try:
+			t = int(text[1:])
+			context.chat_data["matrix"].translate(t)
+			users.update_matrix(chat_id, text, context.chat_data["matrix"].matrix_to_string())
+			us.add_matrix(1)
+			await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_op", get_language(context)), parse_mode=ParseMode.HTML)
+		except:
+			us.add_matrix(2)
+			await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_operror", get_language(context)), parse_mode=ParseMode.HTML)
+	elif text.lower().startswith("x"):
+		try:
+			t = int(text[1:])
+			context.chat_data["matrix"].multiply(t)
+			users.update_matrix(chat_id, text, context.chat_data["matrix"].matrix_to_string())
+			us.add_matrix(1)
+			await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_op", get_language(context)), parse_mode=ParseMode.HTML)
+		except:
+			us.add_matrix(2)
+			await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_operror", get_language(context)), parse_mode=ParseMode.HTML)
+	elif text.lower() == "r":
+		context.chat_data["matrix"].shuffle_status()
+		users.update_matrix(chat_id, text, context.chat_data["matrix"].matrix_to_string())
+		us.add_matrix(1)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_op", get_language(context)), parse_mode=ParseMode.HTML)
+	elif text.lower() == "t":
+		context.chat_data["matrix"].transpose()
+		users.update_matrix(chat_id, text, context.chat_data["matrix"].matrix_to_string())
+		us.add_matrix(1)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_op", get_language(context)), parse_mode=ParseMode.HTML)
+	elif text.lower() == "i":
+		context.chat_data["matrix"].invert()
+		users.update_matrix(chat_id, text, context.chat_data["matrix"].matrix_to_string())
+		us.add_matrix(1)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_op", get_language(context)), parse_mode=ParseMode.HTML)
+	elif text.lower() == "s":
+		context.chat_data["matrix"].swap_round()
+		users.update_matrix(chat_id, text, context.chat_data["matrix"].matrix_to_string())
+		us.add_matrix(1)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_op", get_language(context)), parse_mode=ParseMode.HTML)
+	elif text.lower() == "p":
+		matrix_string = "<pre>" + context.chat_data["matrix"].matrix_to_string() + "</pre>"
+		us.add_matrix(1)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_state", get_language(context)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=matrix_string, parse_mode=ParseMode.HTML)
+	elif text.lower() == "f":
+		try:
+			matrix_history = users.get_matrix_history(chat_id)
+			us.add_matrix(1)
+			await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_file", get_language(context)), parse_mode=ParseMode.HTML)
+			await context.bot.send_document(chat_id, matrix_history, filename=msg.get_message("matrix_filename", get_language(context)),
+																			caption=msg.get_message("matrix_filecaption", get_language(context)))
+		except Exception as e:
+			await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_fileerror", get_language(context)), parse_mode=ParseMode.HTML)
+			us.add_matrix(2)
+			print(e)
+	return MATRIX
+
+#Building the matrix keyboard...
+def matrix_keyboard(language: int):
+	tags = msg.get_keyboard_tags("matrix_keyboard", language)
+	keyboard = [[InlineKeyboardButton(text=tags[0], callback_data="m_0"), InlineKeyboardButton(text=tags[1], callback_data="m_1")],
+							[InlineKeyboardButton(text=tags[2], callback_data="m_2"), InlineKeyboardButton(text=tags[3], callback_data="m_3")]]
+	return keyboard
+
+#Handling matrix conversation clicks...
+async def matrix_conversation_button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+	chat_id = update.effective_chat.id
+	query = update.callback_query
+	await query.answer()
+	selection = int(query.data.split("_")[1])
+	if selection == 0:
+		context.chat_data["matrix_status"] = 1
+		context.chat_data["matrix_type"] = 0
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_selection_1", get_language(context)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_set1", get_language(context)), parse_mode=ParseMode.HTML)
+	elif selection == 1:
+		context.chat_data["matrix_status"] = 1
+		context.chat_data["matrix_type"] = 1
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_selection_2", get_language(context)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_set1", get_language(context)), parse_mode=ParseMode.HTML)
+	elif selection == 2:
+		context.chat_data["matrix_status"] = 1
+		context.chat_data["matrix_type"] = 2
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_selection_3", get_language(context)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_chain", get_language(context)), parse_mode=ParseMode.HTML)
+	elif selection == 3:
+		context.chat_data["matrix_status"] = 1
+		context.chat_data["matrix_type"] = 3
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_selection_4", get_language(context)), parse_mode=ParseMode.HTML)
+		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("matrix_cyclerow", get_language(context)), parse_mode=ParseMode.HTML)
+	return MATRIX
 
 #Starting a random functions session...
 async def trigger_random(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -190,14 +425,15 @@ async def set_dice_size(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 		reply = InlineKeyboardMarkup(keyboard)
 		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("random_distribution", get_language(context)), reply_markup=reply, parse_mode=ParseMode.HTML)
 		return RANDOM_B
-	except:
+	except Exception as e:
 		us.add_random(1)
 		await context.bot.send_message(chat_id=chat_id, text=msg.get_message("random_error", get_language(context)), parse_mode=ParseMode.HTML)
+		print(e)
 		return RANDOM_D
 
 #Building the random keyboard...
 def random_keyboard(language: int):
-	tags = msg.get_keyboard_tags("random_keyboard", get_language(context))
+	tags = msg.get_keyboard_tags("random_keyboard", language)
 	keyboard = [[InlineKeyboardButton(text=tags[0], callback_data="r_0"), InlineKeyboardButton(text=tags[1], callback_data="r_1")],
 							[InlineKeyboardButton(text=tags[2], callback_data="r_2"), InlineKeyboardButton(text=tags[3], callback_data="r_3")],
 							[InlineKeyboardButton(text=tags[4], callback_data="r_4")]]
@@ -359,9 +595,8 @@ async def print_help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 	chat_id = update.effective_chat.id
 	logging.info(str(hide_id(chat_id)) + " asked for help...")
 	us.add_help()
-	m, m2 = msg.build_help_message(get_language(context))
-	await context.bot.send_message(chat_id=chat_id, text=m, parse_mode=ParseMode.HTML)
-	await context.bot.send_message(chat_id=chat_id, text=m2, parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("help_1", get_language(context)), parse_mode=ParseMode.HTML)
+	await context.bot.send_message(chat_id=chat_id, text=msg.get_message("help_2", get_language(context)), parse_mode=ParseMode.HTML)
 
 #Checking which language to use with the actual user...
 def get_language(context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -456,6 +691,8 @@ def build_general_conversation_handler():
 			PCS: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_pcs_info)],
 			ALLSTATES: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_all_states)],
 			CHAIN: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_new_chain)],
+			MATRIX: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_new_matrix),
+								CallbackQueryHandler(matrix_conversation_button_click)],
 			RANDOM_S: [MessageHandler(filters.TEXT & ~filters.COMMAND, set_random_size)],
 			RANDOM_D: [MessageHandler(filters.TEXT & ~filters.COMMAND, set_dice_size)],
 			RANDOM_B: [MessageHandler(filters.TEXT & ~filters.COMMAND, shuffle_message),
@@ -494,7 +731,7 @@ def main() -> None:
 		logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 	print("Ready to build the bot...", end="\n")
 	app = Application.builder().token(config["token"]).build()
-	app.add_error_handler(error_notification)
+	#app.add_error_handler(error_notification)
 	app.add_handler(CommandHandler("language", select_language), group=2)
 	app.add_handler(CommandHandler("help", print_help), group=2)
 	app.add_handler(CommandHandler("privacy", print_privacy), group=2)

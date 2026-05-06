@@ -93,7 +93,7 @@ class Messages():
 			data.append(states[2])
 		for k, v in zip(targets, data):
 			m = re.sub(k, v, m)
-		return m, chain.sequence_to_string(chain.sequence)
+		return m, "<pre>" + chain.sequence_to_string(chain.sequence) + "</pre>"
 
 	def build_operation_chain_message(self, chain, l):
 		m = ""
@@ -102,7 +102,7 @@ class Messages():
 			m = self.msg_es["chain_op"]
 		else:
 			m = self.msg_en["chain_op"]
-		return m, chain.sequence_to_string(chain.sequence)
+		return m, "<pre>" + chain.sequence_to_string(chain.sequence) + "</pre>"
 
 	def get_complete_set_class(self, cardinal, ordinal, interval, inverted, z_pair):
 		m = str(cardinal) + "."
@@ -151,26 +151,3 @@ class Messages():
 			except:
 				pass
 		return success
-
-	def build_help_message(self, l):
-		m = ""
-		if l == 0:
-			m += "Podés pedirme distintas cosas. Acá te dejo los comandos disponibles:\n\n"
-			m += "> Mandame /pcs para analizar conmigo conjuntos de grados cromáticos (ojo que entiendo números (0-11)).\n"
-			m += "> Mandame /chain para crear secuencias de notas con un conjunto de grados cromáticos constante.\n"
-			m += "> Mandame /error para reportar cualquier error que me encuentres."
-		else:
-			m += "You can ask me for different things. Here is a list with the available commands:\n\n"
-			m += "> Send me /pcs to start a pitch class set analysis sesion (note that I understand numbers (0-11)).\n" 
-			m += "> Send me /chain to start a constant pitch class set sequence creation session.\n"
-			m += "> Send me /error to report any error you find on me."
-		m2 = ""
-		if l == 0:
-			m2 += "Podés suscribirte al canal @caltools para enterarte de cómo evoluciono. "
-			m2 += "Si tenés dudas, quejas o preguntas podés escribirle a @rvalla (es el culpable de todo). "
-			m2 += "También podés visitar la página del proyecto <a href='https://musicaltools.gitlab.io'>musiCal</a>."
-		else:
-			m2 += "Suscribe to @caltools channel to find out how I evolve (in spanish). "
-			m2 += "If you have any doubts, complaints or questions you can write to @rvalla (he's the one to blame for everything). "
-			m2 += "You can also visit the <a href='https://musicaltools.gitlab.io/index_en.html'>musiCal</a> project website."
-		return m, m2

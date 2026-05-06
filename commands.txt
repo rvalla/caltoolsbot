@@ -1,7 +1,7 @@
 start - Configurame y empecemos.
 pcs - Analizo conjuntos de grados cromáticos.
 allstates - Te mando todos los estados de un pcs.
-chain - Creo secuencias con pcs constante.
+chain - Encadeno conjuntos de grados cromáticos.
 matrix - Creo y opero matrices musicales.
 random - Genero material al azar.
 error - El comando para reportar un error.
